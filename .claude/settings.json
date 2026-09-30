@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Edit",
+      "Write",
+      "MultiEdit",
+      "Bash(git show *)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git status*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(file:*)",
+      "Bash(php -l:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Read",
+      "Glob",
+      "Grep",
+      "Bash(docker run *)",
+      "Bash(sed *)"
+    ],
+    "deny": [],
+    "ask": [],
+    "additionalDirectories": []
+  }
+}
