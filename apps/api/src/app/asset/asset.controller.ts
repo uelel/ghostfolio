@@ -29,7 +29,15 @@ export class AssetController {
     return {
       marketData,
       splits,
-      assetProfile: pick(assetProfile, ['dataSource', 'name', 'symbol'])
+      assetProfile: pick(assetProfile, [
+        'businessDescription',
+        'competitiveAdvantages',
+        'dataSource',
+        'name',
+        'risks',
+        'symbol',
+        'tailwinds'
+      ])
     };
   }
 }

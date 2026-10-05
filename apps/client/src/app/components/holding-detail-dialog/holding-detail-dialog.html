@@ -370,6 +370,71 @@
           </div>
         </div>
       </mat-tab>
+      @if (
+        assetProfile?.businessDescription ||
+        assetProfile?.tailwinds ||
+        assetProfile?.competitiveAdvantages ||
+        assetProfile?.risks
+      ) {
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <ion-icon name="bulb-outline" />
+            <div class="d-none d-sm-block ml-2" i18n>Research</div>
+          </ng-template>
+          <div class="container mt-3 p-0">
+            @if (assetProfile?.businessDescription) {
+              <div class="mb-3">
+                <div class="h6" i18n>Business Description</div>
+                <div style="white-space: pre-line">
+                  {{ assetProfile.businessDescription }}
+                </div>
+              </div>
+            }
+            @if (assetProfile?.tailwinds) {
+              <div class="mb-3">
+                <div class="h6" i18n>Tailwinds</div>
+                <ul class="mb-0">
+                  @for (
+                    line of assetProfile.tailwinds.split('\n');
+                    track line
+                  ) {
+                    @if (line.trim()) {
+                      <li>{{ line }}</li>
+                    }
+                  }
+                </ul>
+              </div>
+            }
+            @if (assetProfile?.competitiveAdvantages) {
+              <div class="mb-3">
+                <div class="h6" i18n>Competitive Advantages</div>
+                <ul class="mb-0">
+                  @for (
+                    line of assetProfile.competitiveAdvantages.split('\n');
+                    track line
+                  ) {
+                    @if (line.trim()) {
+                      <li>{{ line }}</li>
+                    }
+                  }
+                </ul>
+              </div>
+            }
+            @if (assetProfile?.risks) {
+              <div class="mb-3">
+                <div class="h6" i18n>Risks</div>
+                <ul class="mb-0">
+                  @for (line of assetProfile.risks.split('\n'); track line) {
+                    @if (line.trim()) {
+                      <li>{{ line }}</li>
+                    }
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+        </mat-tab>
+      }
       <mat-tab>
         <ng-template mat-tab-label>
           <ion-icon name="swap-vertical-outline" />

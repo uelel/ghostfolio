@@ -9,6 +9,7 @@ import {
   Benchmark,
   User
 } from '@ghostfolio/common/interfaces';
+import { hasPermission, permissions } from '@ghostfolio/common/permissions';
 import { NotificationService } from '@ghostfolio/ui/notifications';
 
 import {
@@ -170,6 +171,10 @@ export class GfBenchmarkComponent {
         symbol,
         colorScheme: this.user()?.settings?.colorScheme,
         deviceType: this.deviceType(),
+        hasPermissionToAccessAdminControl: hasPermission(
+          this.user()?.permissions,
+          permissions.accessAdminControl
+        ),
         locale: this.locale()
       },
       height: this.deviceType() === 'mobile' ? '98vh' : undefined,

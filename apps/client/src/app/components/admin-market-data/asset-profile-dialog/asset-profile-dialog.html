@@ -492,6 +492,70 @@
       </mat-tab>
       <mat-tab>
         <ng-template mat-tab-label>
+          <ion-icon name="bulb-outline" />
+          <div class="d-none d-sm-block ml-2" i18n>Research</div>
+        </ng-template>
+        <div class="container px-0 py-3">
+          <div class="row w-100" [formGroup]="assetProfileForm">
+            <div class="col-12 mb-3">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label i18n>Business Description</mat-label>
+                <textarea
+                  cdkAutosizeMinRows="8"
+                  cdkTextareaAutosize
+                  formControlName="businessDescription"
+                  matInput
+                  [maxlength]="BUSINESS_DESCRIPTION_MAXIMUM_LENGTH"
+                  (keyup.enter)="$event.stopPropagation()"
+                ></textarea>
+              </mat-form-field>
+            </div>
+            <div class="col-12 mb-3">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label i18n>Tailwinds (one per line)</mat-label>
+                <textarea
+                  cdkAutosizeMinRows="4"
+                  cdkTextareaAutosize
+                  formControlName="tailwinds"
+                  matInput
+                  [maxlength]="BULLET_LIST_MAXIMUM_LENGTH"
+                  (keyup.enter)="$event.stopPropagation()"
+                ></textarea>
+              </mat-form-field>
+            </div>
+            <div class="col-12 mb-3">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label i18n
+                  >Competitive Advantages (one per line)</mat-label
+                >
+                <textarea
+                  cdkAutosizeMinRows="4"
+                  cdkTextareaAutosize
+                  formControlName="competitiveAdvantages"
+                  matInput
+                  [maxlength]="BULLET_LIST_MAXIMUM_LENGTH"
+                  (keyup.enter)="$event.stopPropagation()"
+                ></textarea>
+              </mat-form-field>
+            </div>
+            <div class="col-12 mb-3">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label i18n>Risks (one per line)</mat-label>
+                <textarea
+                  cdkAutosizeMinRows="4"
+                  cdkTextareaAutosize
+                  formControlName="risks"
+                  matInput
+                  [maxlength]="BULLET_LIST_MAXIMUM_LENGTH"
+                  (keyup.enter)="$event.stopPropagation()"
+                ></textarea>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
           <ion-icon name="server-outline" />
           <div class="d-none d-sm-block ml-2" i18n>Historical Market Data</div>
         </ng-template>

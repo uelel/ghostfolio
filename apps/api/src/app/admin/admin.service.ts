@@ -473,7 +473,9 @@ export class AdminService {
     {
       assetClass,
       assetSubClass,
+      businessDescription,
       comment,
+      competitiveAdvantages,
       countries,
       currency,
       dataGatheringFrequency,
@@ -481,10 +483,12 @@ export class AdminService {
       holdings,
       isActive,
       name,
+      risks,
       scraperConfiguration,
       sectors,
       symbol: newSymbol,
       symbolMapping,
+      tailwinds,
       url
     }: Prisma.SymbolProfileUpdateInput
   ) {
@@ -601,14 +605,18 @@ export class AdminService {
       };
 
       const updatedSymbolProfile: Prisma.SymbolProfileUpdateInput = {
+        businessDescription,
         comment,
+        competitiveAdvantages,
         currency,
         dataGatheringFrequency,
         dataSource,
         isActive,
+        risks,
         scraperConfiguration,
         symbol,
         symbolMapping,
+        tailwinds,
         ...this.symbolProfileService.getAssetProfileUpdateInput(
           { dataSource, symbol },
           assetProfileOverrides

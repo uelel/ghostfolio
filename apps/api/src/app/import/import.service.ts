@@ -937,10 +937,14 @@ export class ImportService {
             symbolMapping,
             updatedAt,
             url,
+            businessDescription: assetProfile.businessDescription,
             comment: assetProfile.comment,
+            competitiveAdvantages: assetProfile.competitiveAdvantages,
             currency: assetProfile.currency,
             dataGatheringFrequency:
               assetProfile.dataGatheringFrequency ?? 'DAILY',
+            risks: assetProfile.risks,
+            tailwinds: assetProfile.tailwinds,
             userId: dataSource === 'MANUAL' ? user.id : undefined
           },
           symbolProfileId: undefined,

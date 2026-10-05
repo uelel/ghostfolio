@@ -189,7 +189,9 @@ export class ExportService {
         ({
           assetClass,
           assetSubClass,
+          businessDescription,
           comment,
+          competitiveAdvantages,
           countries,
           currency,
           cusip,
@@ -202,14 +204,18 @@ export class ExportService {
           isActive,
           isin,
           name,
+          risks,
           sectors,
           symbol,
+          tailwinds,
           url
         }) => {
           return {
             assetClass,
             assetSubClass,
+            businessDescription,
             comment,
+            competitiveAdvantages,
             countries: countries as unknown as Prisma.JsonArray,
             currency,
             cusip,
@@ -222,8 +228,10 @@ export class ExportService {
             isin,
             marketData: marketDataByAssetProfile[id],
             name,
+            risks,
             sectors: sectors as unknown as Prisma.JsonArray,
             symbol,
+            tailwinds,
             url
           };
         }
