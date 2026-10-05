@@ -75,6 +75,7 @@ import { format, isSameMonth, isToday, parseISO } from 'date-fns';
 import { addIcons } from 'ionicons';
 import {
   arrowDownCircleOutline,
+  bulbOutline,
   createOutline,
   flagOutline,
   readerOutline,
@@ -129,13 +130,17 @@ export class GfHoldingDetailDialogComponent implements OnInit {
     EnhancedAssetProfile,
     | 'assetClass'
     | 'assetSubClass'
+    | 'businessDescription'
+    | 'competitiveAdvantages'
     | 'countries'
     | 'currency'
     | 'dataSource'
     | 'isin'
     | 'name'
+    | 'risks'
     | 'sectors'
     | 'symbol'
+    | 'tailwinds'
     | 'userId'
   >;
   protected assetSubClass: string;
@@ -228,6 +233,7 @@ export class GfHoldingDetailDialogComponent implements OnInit {
 
     addIcons({
       arrowDownCircleOutline,
+      bulbOutline,
       createOutline,
       flagOutline,
       readerOutline,

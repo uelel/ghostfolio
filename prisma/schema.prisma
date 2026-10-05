@@ -235,7 +235,9 @@ model SymbolProfile {
   assetProfileOverrides  AssetProfileOverrides?
   assetProfileSplits     AssetProfileSplit[]
   assetSubClass          AssetSubClass?
+  businessDescription    String?
   comment                String?
+  competitiveAdvantages  String?
   countries              Json?
   createdAt              DateTime               @default(now())
   currency               String
@@ -250,10 +252,12 @@ model SymbolProfile {
   isActive               Boolean                @default(true)
   isin                   String?
   name                   String?
+  risks                  String?
   scraperConfiguration   Json?
   sectors                Json?
   symbol                 String
   symbolMapping          Json?
+  tailwinds              String?
   updatedAt              DateTime               @updatedAt
   url                    String?
   user                   User?                  @relation(fields: [userId], onDelete: Cascade, references: [id])

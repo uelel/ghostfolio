@@ -63,6 +63,9 @@ export const BULL_BOARD_COOKIE_NAME = 'bull_board_token';
  */
 export const BULL_BOARD_ROUTE = '/admin/queues';
 
+export const BULLET_LIST_MAXIMUM_LENGTH = 3000;
+export const BUSINESS_DESCRIPTION_MAXIMUM_LENGTH = 5000;
+
 export const CACHE_TTL_NO_CACHE = 1;
 export const CACHE_TTL_INFINITE = 0;
 
@@ -130,9 +133,13 @@ export const DEFAULT_REDACTED_PATHS = [
   'accounts[*].value',
   'accounts[*].valueInBaseCurrency',
   'activities[*].account.comment',
+  'activities[*].assetProfile.businessDescription',
   'activities[*].assetProfile.comment',
+  'activities[*].assetProfile.competitiveAdvantages',
+  'activities[*].assetProfile.risks',
   'activities[*].assetProfile.scraperConfiguration',
   'activities[*].assetProfile.symbolMapping',
+  'activities[*].assetProfile.tailwinds',
   'activities[*].assetProfile.watchedByCount',
   'activities[*].comment',
   'activities[*].fee',
@@ -141,9 +148,13 @@ export const DEFAULT_REDACTED_PATHS = [
   'activities[*].quantity',
   'activities[*].value',
   'activities[*].valueInBaseCurrency',
+  'assetProfile.businessDescription',
   'assetProfile.comment',
+  'assetProfile.competitiveAdvantages',
+  'assetProfile.risks',
   'assetProfile.scraperConfiguration',
   'assetProfile.symbolMapping',
+  'assetProfile.tailwinds',
   'assetProfile.watchedByCount',
   'balance',
   'balanceInBaseCurrency',
