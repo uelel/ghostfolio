@@ -31,6 +31,67 @@
       [showXAxis]="true"
       [showYAxis]="true"
     />
+
+    @if (assetProfile?.businessDescription) {
+      <div class="mb-3">
+        <div class="h6" i18n>Business Description</div>
+        <div style="white-space: pre-line">
+          {{ assetProfile.businessDescription }}
+        </div>
+      </div>
+    }
+    @if (assetProfile?.tailwinds) {
+      <div class="mb-3">
+        <div class="h6" i18n>Tailwinds</div>
+        <ul class="mb-0">
+          @for (line of assetProfile.tailwinds.split('\n'); track line) {
+            @if (line.trim()) {
+              <li>{{ line }}</li>
+            }
+          }
+        </ul>
+      </div>
+    }
+    @if (assetProfile?.competitiveAdvantages) {
+      <div class="mb-3">
+        <div class="h6" i18n>Competitive Advantages</div>
+        <ul class="mb-0">
+          @for (
+            line of assetProfile.competitiveAdvantages.split('\n');
+            track line
+          ) {
+            @if (line.trim()) {
+              <li>{{ line }}</li>
+            }
+          }
+        </ul>
+      </div>
+    }
+    @if (assetProfile?.risks) {
+      <div class="mb-3">
+        <div class="h6" i18n>Risks</div>
+        <ul class="mb-0">
+          @for (line of assetProfile.risks.split('\n'); track line) {
+            @if (line.trim()) {
+              <li>{{ line }}</li>
+            }
+          }
+        </ul>
+      </div>
+    }
+
+    @if (data.hasPermissionToAccessAdminControl) {
+      <a
+        mat-stroked-button
+        [routerLink]="
+          routerLinkAdminControlMarketDataUpdate(data.dataSource, data.symbol)
+        "
+        (click)="onClose()"
+        ><ion-icon class="mr-1" name="create-outline" /><span i18n
+          >Manage Asset Profile</span
+        >...</a
+      >
+    }
   </div>
 </div>
 
