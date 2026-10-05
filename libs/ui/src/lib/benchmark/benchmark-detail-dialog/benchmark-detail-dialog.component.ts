@@ -3,6 +3,7 @@ import {
   AdminMarketDataDetails,
   LineChartItem
 } from '@ghostfolio/common/interfaces';
+import { internalRoutes } from '@ghostfolio/common/routes/routes';
 import { GfDialogFooterComponent } from '@ghostfolio/ui/dialog-footer';
 import { GfDialogHeaderComponent } from '@ghostfolio/ui/dialog-header';
 import { DataService } from '@ghostfolio/ui/services';
@@ -17,11 +18,13 @@ import {
   OnInit
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
   MatDialogRef
 } from '@angular/material/dialog';
+import { RouterModule } from '@angular/router';
 import { format } from 'date-fns';
 
 import { GfLineChartComponent } from '../../line-chart/line-chart.component';
@@ -36,7 +39,9 @@ import { BenchmarkDetailDialogParams } from './interfaces/interfaces';
     GfDialogHeaderComponent,
     GfLineChartComponent,
     GfValueComponent,
-    MatDialogModule
+    MatButtonModule,
+    MatDialogModule,
+    RouterModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   selector: 'gf-benchmark-detail-dialog',
@@ -47,6 +52,9 @@ export class GfBenchmarkDetailDialogComponent implements OnInit {
   public assetProfile?: AdminMarketDataDetails['assetProfile'];
   public historicalDataItems: LineChartItem[];
   public isLoading = true;
+  public readonly routerLinkAdminControlMarketDataUpdate =
+    internalRoutes.adminControl.subRoutes.marketData.subRoutes.update
+      .routerLink;
   public value: number;
 
   public constructor(

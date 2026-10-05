@@ -1,4 +1,6 @@
 import {
+  BULLET_LIST_MAXIMUM_LENGTH,
+  BUSINESS_DESCRIPTION_MAXIMUM_LENGTH,
   COMMENT_MAXIMUM_LENGTH,
   SYMBOL_MAXIMUM_LENGTH
 } from '@ghostfolio/common/config';
@@ -40,8 +42,18 @@ export class UpdateAssetProfileDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(BUSINESS_DESCRIPTION_MAXIMUM_LENGTH)
+  businessDescription?: string | null;
+
+  @IsOptional()
+  @IsString()
   @MaxLength(COMMENT_MAXIMUM_LENGTH)
   comment?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(BULLET_LIST_MAXIMUM_LENGTH)
+  competitiveAdvantages?: string | null;
 
   @IsArray()
   @IsOptional()
@@ -75,6 +87,11 @@ export class UpdateAssetProfileDto {
   @IsString()
   name?: string;
 
+  @IsOptional()
+  @IsString()
+  @MaxLength(BULLET_LIST_MAXIMUM_LENGTH)
+  risks?: string | null;
+
   @IsObject()
   @IsOptional()
   @Type(() => ScraperConfigurationDto)
@@ -97,6 +114,11 @@ export class UpdateAssetProfileDto {
   symbolMapping?: {
     [dataProvider: string]: string;
   };
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(BULLET_LIST_MAXIMUM_LENGTH)
+  tailwinds?: string | null;
 
   @IsOptional()
   @IsUrl({
