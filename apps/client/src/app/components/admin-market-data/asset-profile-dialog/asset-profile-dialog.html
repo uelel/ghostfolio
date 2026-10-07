@@ -558,6 +558,47 @@
       </mat-tab>
       <mat-tab>
         <ng-template mat-tab-label>
+          <ion-icon name="stats-chart-outline" />
+          <div class="d-none d-sm-block ml-2" i18n>Fundamentals</div>
+        </ng-template>
+        <div class="container px-0 py-3" [formGroup]="assetProfileForm">
+          <gf-historical-metric-editor
+            class="d-block mb-4"
+            formControlName="historicalEps"
+            i18n-label
+            i18n-yAxisLabel
+            label="Earnings per share"
+            unit="currency"
+            yAxisLabel="EPS"
+            [colorScheme]="user?.settings?.colorScheme"
+            [currency]="assetProfile?.currency"
+            [locale]="data.locale"
+          />
+          <gf-historical-metric-editor
+            class="d-block mb-4"
+            formControlName="historicalDps"
+            i18n-label
+            i18n-yAxisLabel
+            label="Dividends per share"
+            unit="currency"
+            yAxisLabel="DPS"
+            [colorScheme]="user?.settings?.colorScheme"
+            [currency]="assetProfile?.currency"
+            [locale]="data.locale"
+          />
+          <gf-historical-metric-editor
+            class="d-block"
+            formControlName="historicalPayoutRatio"
+            i18n-label
+            label="Dividend Payout Ratio"
+            unit="percent"
+            [colorScheme]="user?.settings?.colorScheme"
+            [locale]="data.locale"
+          />
+        </div>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
           <ion-icon name="server-outline" />
           <div class="d-none d-sm-block ml-2" i18n>Historical Market Data</div>
         </ng-template>

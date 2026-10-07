@@ -943,6 +943,9 @@ export class ImportService {
             currency: assetProfile.currency,
             dataGatheringFrequency:
               assetProfile.dataGatheringFrequency ?? 'DAILY',
+            historicalDps: assetProfile.historicalDps ?? [],
+            historicalEps: assetProfile.historicalEps ?? [],
+            historicalPayoutRatio: assetProfile.historicalPayoutRatio ?? [],
             risks: assetProfile.risks,
             tailwinds: assetProfile.tailwinds,
             userId: dataSource === 'MANUAL' ? user.id : undefined

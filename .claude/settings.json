@@ -23,7 +23,9 @@
       "Glob",
       "Grep",
       "Bash(docker run *)",
-      "Bash(sed *)"
+      "Bash(sed *)",
+      "Bash(npx *)",
+      "Bash(npm *)"
     ],
     "deny": [],
     "ask": [],

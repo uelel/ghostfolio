@@ -4,6 +4,7 @@ import { applyAssetProfileOverrides } from '@ghostfolio/common/helper';
 import {
   AssetProfileIdentifier,
   EnhancedAssetProfile,
+  HistoricalMetricPoint,
   Holding,
   ScraperConfiguration
 } from '@ghostfolio/common/interfaces';
@@ -212,6 +213,9 @@ export class SymbolProfileService {
       countries,
       currency,
       dataGatheringFrequency,
+      historicalDps,
+      historicalEps,
+      historicalPayoutRatio,
       holdings,
       isActive,
       name,
@@ -234,6 +238,9 @@ export class SymbolProfileService {
         countries,
         currency,
         dataGatheringFrequency,
+        historicalDps,
+        historicalEps,
+        historicalPayoutRatio,
         holdings,
         isActive,
         name,
@@ -270,6 +277,15 @@ export class SymbolProfileService {
           symbolProfileWithOverrides?.countries as unknown as Prisma.JsonArray
         ),
         dateOfFirstActivity: undefined as Date,
+        historicalDps: this.getHistoricalMetricPoints(
+          symbolProfileWithOverrides?.historicalDps as unknown as Prisma.JsonArray
+        ),
+        historicalEps: this.getHistoricalMetricPoints(
+          symbolProfileWithOverrides?.historicalEps as unknown as Prisma.JsonArray
+        ),
+        historicalPayoutRatio: this.getHistoricalMetricPoints(
+          symbolProfileWithOverrides?.historicalPayoutRatio as unknown as Prisma.JsonArray
+        ),
         holdings: this.getHoldings(
           symbolProfileWithOverrides?.holdings as unknown as Prisma.JsonArray
         ),
@@ -311,6 +327,26 @@ export class SymbolProfileService {
         name: countries[code]?.name ?? UNKNOWN_KEY
       };
     });
+  }
+
+  private getHistoricalMetricPoints(
+    aPoints: Prisma.JsonArray = []
+  ): HistoricalMetricPoint[] {
+    if (!Array.isArray(aPoints)) {
+      return [];
+    }
+
+    return aPoints
+      .map((point) => {
+        const { date, value } = (point ?? {}) as Prisma.JsonObject;
+
+        if (typeof date !== 'string' || typeof value !== 'number') {
+          return null;
+        }
+
+        return { date, value };
+      })
+      .filter((p): p is HistoricalMetricPoint => p !== null);
   }
 
   private getHoldings(aHoldings: Prisma.JsonArray = []): Holding[] {

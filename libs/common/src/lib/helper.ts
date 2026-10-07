@@ -755,6 +755,55 @@ export function parseDate(date: string): Date | undefined {
   return parseISO(date);
 }
 
+export function parseFundamentalCsv(
+  input: string
+): { date: string; value: number }[] {
+  return input
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const tokens = line.split(/[\s,;]+/);
+
+      if (tokens.length < 2) {
+        return null;
+      }
+
+      const iso = parseShortMonthYear(tokens[0]);
+      const value = Number(tokens[1].replace(',', '.'));
+
+      if (!iso || Number.isNaN(value)) {
+        return null;
+      }
+
+      return { date: iso, value };
+    })
+    .filter(
+      (point): point is { date: string; value: number } => point !== null
+    );
+}
+
+function parseShortMonthYear(raw: string): string | null {
+  const match = /^(\d{1,2})\/(\d{1,4})$/.exec(raw);
+
+  if (!match) {
+    return null;
+  }
+
+  const month = Number(match[1]);
+  let year = Number(match[2]);
+
+  if (month < 1 || month > 12) {
+    return null;
+  }
+
+  if (year < 100) {
+    year = year <= 50 ? 2000 + year : 1900 + year;
+  }
+
+  return `${year}-${String(month).padStart(2, '0')}-01`;
+}
+
 export function parseSymbol({ dataSource, symbol }: AssetProfileIdentifier) {
   const [ticker, exchange] = symbol.split('.');
 

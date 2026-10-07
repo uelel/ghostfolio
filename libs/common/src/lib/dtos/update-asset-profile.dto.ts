@@ -27,6 +27,7 @@ import {
 } from 'class-validator';
 
 import { CountryDto } from './country.dto';
+import { HistoricalMetricPointDto } from './historical-metric-point.dto';
 import { HoldingDto } from './holding.dto';
 import { ScraperConfigurationDto } from './scraper-configuration.dto';
 import { SectorDto } from './sector.dto';
@@ -72,6 +73,24 @@ export class UpdateAssetProfileDto {
   @IsEnum(DataSource)
   @IsOptional()
   dataSource?: DataSource;
+
+  @IsArray()
+  @IsOptional()
+  @Type(() => HistoricalMetricPointDto)
+  @ValidateNested({ each: true })
+  historicalDps?: Prisma.InputJsonArray;
+
+  @IsArray()
+  @IsOptional()
+  @Type(() => HistoricalMetricPointDto)
+  @ValidateNested({ each: true })
+  historicalEps?: Prisma.InputJsonArray;
+
+  @IsArray()
+  @IsOptional()
+  @Type(() => HistoricalMetricPointDto)
+  @ValidateNested({ each: true })
+  historicalPayoutRatio?: Prisma.InputJsonArray;
 
   @IsArray()
   @IsOptional()
