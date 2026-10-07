@@ -18,6 +18,7 @@ import {
   isValidCustomAssetProfileSymbol,
   isValidDateAfter1970,
   isValidGranteeOfAccess,
+  parseFundamentalCsv,
   resolveUserSettings
 } from '@ghostfolio/common/helper';
 import { UserSettings } from '@ghostfolio/common/interfaces';
@@ -658,6 +659,44 @@ describe('Helper', () => {
         locale: 'de-CH',
         viewMode: 'DEFAULT'
       });
+    });
+  });
+
+  describe('Parse fundamental CSV', () => {
+    it('parses tab-separated rows', () => {
+      const input = `1/8\t0.04\n1/9\t0.10\n1/10\t0.16`;
+
+      expect(parseFundamentalCsv(input)).toEqual([
+        { date: '2008-01-01', value: 0.04 },
+        { date: '2009-01-01', value: 0.1 },
+        { date: '2010-01-01', value: 0.16 }
+      ]);
+    });
+
+    it('parses space-separated rows and skips blank lines', () => {
+      const input = `12/19   2.75\n\n3/22, 4.78`;
+
+      expect(parseFundamentalCsv(input)).toEqual([
+        { date: '2019-12-01', value: 2.75 },
+        { date: '2022-03-01', value: 4.78 }
+      ]);
+    });
+
+    it('disambiguates two-digit years: <= 50 → 2000s, > 50 → 1900s', () => {
+      const input = `1/50\t1\n1/51\t2`;
+
+      expect(parseFundamentalCsv(input)).toEqual([
+        { date: '2050-01-01', value: 1 },
+        { date: '1951-01-01', value: 2 }
+      ]);
+    });
+
+    it('skips rows with invalid date or value', () => {
+      const input = `foo bar\n13/9 1\n1/8 notanumber\n1/8 1.5`;
+
+      expect(parseFundamentalCsv(input)).toEqual([
+        { date: '2008-01-01', value: 1.5 }
+      ]);
     });
   });
 });

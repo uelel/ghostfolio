@@ -19,6 +19,7 @@ import type { Filter } from './filter.interface';
 import type { FireCalculationCompleteEvent } from './fire-calculation-complete-event.interface';
 import type { FireWealth } from './fire-wealth.interface';
 import type { HistoricalDataItem } from './historical-data-item.interface';
+import type { HistoricalMetricPoint } from './historical-metric-point.interface';
 import type { HoldingWithParents } from './holding-with-parents.interface';
 import type { Holding } from './holding.interface';
 import type { InfoItem } from './info-item.interface';
@@ -148,6 +149,7 @@ export {
   FireCalculationCompleteEvent,
   FireWealth,
   HistoricalDataItem,
+  HistoricalMetricPoint,
   HistoricalResponse,
   Holding,
   HoldingWithParents,

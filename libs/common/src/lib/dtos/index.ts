@@ -13,6 +13,7 @@ import { CreateTagDto } from './create-tag.dto';
 import { CreateUserDto } from './create-user.dto';
 import { CreateWatchlistItemDto } from './create-watchlist-item.dto';
 import { DeleteOwnUserDto } from './delete-own-user.dto';
+import { HistoricalMetricPointDto } from './historical-metric-point.dto';
 import { HoldingDto } from './holding.dto';
 import { MergeAssetProfileDto } from './merge-asset-profile.dto';
 import { ScraperConfigurationDto } from './scraper-configuration.dto';
@@ -47,6 +48,7 @@ export {
   CreateUserDto,
   CreateWatchlistItemDto,
   DeleteOwnUserDto,
+  HistoricalMetricPointDto,
   HoldingDto,
   MergeAssetProfileDto,
   ScraperConfigurationDto,

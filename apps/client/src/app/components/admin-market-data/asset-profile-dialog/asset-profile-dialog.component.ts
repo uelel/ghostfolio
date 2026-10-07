@@ -25,6 +25,7 @@ import {
   AdminMarketDataDetails,
   AssetClassSelectorOption,
   AssetProfileIdentifier,
+  HistoricalMetricPoint,
   LineChartItem,
   ScraperConfiguration,
   User
@@ -88,6 +89,7 @@ import {
   MatDialogModule,
   MatDialogRef
 } from '@angular/material/dialog';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
@@ -107,6 +109,7 @@ import {
   gitCompareOutline,
   readerOutline,
   serverOutline,
+  statsChartOutline,
   trashOutline
 } from 'ionicons/icons';
 import { isBoolean } from 'lodash-es';
@@ -114,6 +117,7 @@ import ms from 'ms';
 import { EMPTY } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
+import { GfHistoricalMetricEditorComponent } from './historical-metric-editor/historical-metric-editor.component';
 import { AssetProfileDialogParams } from './interfaces/interfaces';
 
 @Component({
@@ -125,6 +129,7 @@ import { AssetProfileDialogParams } from './interfaces/interfaces';
     GfCurrencySelectorComponent,
     GfEntityLogoComponent,
     GfHistoricalMarketDataEditorComponent,
+    GfHistoricalMetricEditorComponent,
     GfLineChartComponent,
     GfPortfolioProportionChartComponent,
     GfSymbolAutocompleteComponent,
@@ -134,6 +139,7 @@ import { AssetProfileDialogParams } from './interfaces/interfaces';
     MatCheckboxModule,
     MatDatepickerModule,
     MatDialogModule,
+    MatExpansionModule,
     MatInputModule,
     MatMenuModule,
     MatSelectModule,
@@ -183,6 +189,9 @@ export class GfAssetProfileDialogComponent implements OnInit {
     historicalData: this.formBuilder.group({
       csvString: ''
     }),
+    historicalDps: new FormControl<HistoricalMetricPoint[]>([]),
+    historicalEps: new FormControl<HistoricalMetricPoint[]>([]),
+    historicalPayoutRatio: new FormControl<HistoricalMetricPoint[]>([]),
     isActive: [true],
     name: ['', Validators.required],
     risks: '',
@@ -350,6 +359,7 @@ export class GfAssetProfileDialogComponent implements OnInit {
       gitCompareOutline,
       readerOutline,
       serverOutline,
+      statsChartOutline,
       trashOutline
     });
   }
@@ -488,6 +498,12 @@ export class GfAssetProfileDialogComponent implements OnInit {
           historicalData: {
             csvString: GfAssetProfileDialogComponent.HISTORICAL_DATA_TEMPLATE
           },
+          historicalDps: (this.assetProfile?.historicalDps ??
+            []) as HistoricalMetricPoint[],
+          historicalEps: (this.assetProfile?.historicalEps ??
+            []) as HistoricalMetricPoint[],
+          historicalPayoutRatio: (this.assetProfile?.historicalPayoutRatio ??
+            []) as HistoricalMetricPoint[],
           isActive: isBoolean(this.assetProfile?.isActive)
             ? this.assetProfile.isActive
             : null,
@@ -736,6 +752,12 @@ export class GfAssetProfileDialogComponent implements OnInit {
       dataGatheringFrequency:
         this.assetProfileForm.controls.dataGatheringFrequency.value ??
         undefined,
+      historicalDps: (this.assetProfileForm.controls.historicalDps.value ??
+        []) as unknown as Prisma.InputJsonArray,
+      historicalEps: (this.assetProfileForm.controls.historicalEps.value ??
+        []) as unknown as Prisma.InputJsonArray,
+      historicalPayoutRatio: (this.assetProfileForm.controls
+        .historicalPayoutRatio.value ?? []) as unknown as Prisma.InputJsonArray,
       isActive: isBoolean(this.assetProfileForm.controls.isActive.value)
         ? this.assetProfileForm.controls.isActive.value
         : undefined,
