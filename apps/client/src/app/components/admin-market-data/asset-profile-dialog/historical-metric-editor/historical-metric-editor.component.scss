@@ -1,0 +1,22 @@
+:host {
+  display: block;
+}
+
+.chart-container {
+  position: relative;
+}
+
+.mat-mdc-cell input.form-control {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  padding: 0.25rem 0.5rem;
+  transition: border-color 150ms ease;
+  width: 100%;
+
+  &:focus,
+  &:hover {
+    border-color: rgba(128, 128, 128, 0.4);
+    outline: none;
+  }
+}

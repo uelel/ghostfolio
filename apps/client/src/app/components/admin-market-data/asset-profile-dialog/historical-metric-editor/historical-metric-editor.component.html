@@ -1,0 +1,82 @@
+<mat-expansion-panel class="mb-3" [expanded]="true">
+  <mat-expansion-panel-header>
+    <mat-panel-title>{{ label }}</mat-panel-title>
+    <mat-panel-description class="justify-content-end">
+      {{ chartItems.length }}
+      <ng-container i18n>points</ng-container>
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+
+  <table class="gf-table w-100">
+    <thead>
+      <tr class="mat-mdc-header-row">
+        <th class="mat-mdc-header-cell px-1 py-2" i18n>Date (M/YY)</th>
+        <th class="mat-mdc-header-cell px-1 py-2" i18n>Value</th>
+        <th class="mat-mdc-header-cell px-1 py-2"></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows.controls; track $index) {
+        <tr class="mat-mdc-row" [formGroup]="row">
+          <td class="mat-mdc-cell px-1 py-1">
+            <input
+              class="form-control form-control-sm"
+              formControlName="dateDisplay"
+              placeholder="1/25"
+              type="text"
+              (paste)="onPaste($event, $index)"
+            />
+          </td>
+          <td class="mat-mdc-cell px-1 py-1">
+            <input
+              class="form-control form-control-sm"
+              formControlName="value"
+              step="any"
+              type="number"
+            />
+          </td>
+          <td class="mat-mdc-cell px-1 py-1 text-right">
+            <button
+              mat-icon-button
+              type="button"
+              [disabled]="disabled"
+              (click)="onDeleteRow($index)"
+            >
+              <ion-icon name="trash-outline" />
+            </button>
+          </td>
+        </tr>
+      }
+      @if (rows.length === 0) {
+        <tr class="mat-mdc-row">
+          <td class="mat-mdc-cell px-1 py-1 w-50">
+            <input
+              class="form-control form-control-sm"
+              placeholder="Paste data or add a row"
+              type="text"
+              (paste)="onPaste($event, 0)"
+            />
+          </td>
+          <td class="mat-mdc-cell px-1 py-1 w-50"></td>
+          <td class="mat-mdc-cell px-1 py-1"></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <div class="mt-2">
+    <button
+      mat-stroked-button
+      type="button"
+      [disabled]="disabled"
+      (click)="onAddRow()"
+    >
+      <ion-icon name="add-outline" />
+      <ng-container i18n>Add row</ng-container>
+    </button>
+  </div>
+</mat-expansion-panel>
+
+<div class="chart-container mt-3 w-100">
+  <canvas #chartCanvas></canvas>
+</div>
