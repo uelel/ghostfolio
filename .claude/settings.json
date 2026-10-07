@@ -5,10 +5,7 @@
       "Edit",
       "Write",
       "MultiEdit",
-      "Bash(git show *)",
-      "Bash(git log *)",
-      "Bash(git diff *)",
-      "Bash(git status*)",
+      "Bash(git *)",
       "Bash(ls:*)",
       "Bash(find:*)",
       "Bash(cat:*)",
@@ -23,7 +20,9 @@
       "Glob",
       "Grep",
       "Bash(docker run *)",
-      "Bash(sed *)"
+      "Bash(sed *)",
+      "Bash(npx *)",
+      "Bash(npm *)"
     ],
     "deny": [],
     "ask": [],
