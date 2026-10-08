@@ -129,15 +129,16 @@ export class AssetProfilesService {
     screenshotContentType?: string;
     symbolProfileId: string;
   }): Promise<AssetProfileValuation> {
-    const assetProfileValuation = await this.assetProfileValuationService.create({
-      category,
-      date,
-      dividendYieldPercent,
-      peRatio,
-      screenshot,
-      screenshotContentType,
-      symbolProfileId
-    });
+    const assetProfileValuation =
+      await this.assetProfileValuationService.create({
+        category,
+        date,
+        dividendYieldPercent,
+        peRatio,
+        screenshot,
+        screenshotContentType,
+        symbolProfileId
+      });
 
     return this.serializeValuation(assetProfileValuation);
   }
@@ -223,29 +224,28 @@ export class AssetProfilesService {
         await this.activitiesService.getStatisticsByCurrency(currency));
     }
 
-    const [[assetProfile], marketData, splits, valuations] =
-      await Promise.all([
-        this.symbolProfileService.getSymbolProfiles([
-          {
-            dataSource,
-            symbol
-          }
-        ]),
-        this.marketDataService.marketDataItems({
-          orderBy: {
-            date: 'asc'
-          },
-          where: {
-            dataSource,
-            symbol
-          }
-        }),
-        this.assetProfileSplitService.getSplits({ dataSource, symbol }),
-        this.assetProfileValuationService.getValuations({
+    const [[assetProfile], marketData, splits, valuations] = await Promise.all([
+      this.symbolProfileService.getSymbolProfiles([
+        {
           dataSource,
           symbol
-        })
-      ]);
+        }
+      ]),
+      this.marketDataService.marketDataItems({
+        orderBy: {
+          date: 'asc'
+        },
+        where: {
+          dataSource,
+          symbol
+        }
+      }),
+      this.assetProfileSplitService.getSplits({ dataSource, symbol }),
+      this.assetProfileValuationService.getValuations({
+        dataSource,
+        symbol
+      })
+    ]);
 
     if (assetProfile) {
       assetProfile.dataProviderInfo = this.dataProviderService

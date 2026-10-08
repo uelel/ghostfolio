@@ -6,7 +6,11 @@ import { DataGatheringService } from '@ghostfolio/api/services/queues/data-gathe
 
 import { NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { AssetProfileSplit, AssetProfileValuation, DataSource } from '@prisma/client';
+import {
+  AssetProfileSplit,
+  AssetProfileValuation,
+  DataSource
+} from '@prisma/client';
 
 import { AssetProfilesService } from './asset-profiles.service';
 

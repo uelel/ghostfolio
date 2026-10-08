@@ -50,13 +50,14 @@ export class AssetProfileValuationService {
     id: string;
     symbolProfileId: string;
   }) {
-    const { count } =
-      await this.prismaService.assetProfileValuation.deleteMany({
+    const { count } = await this.prismaService.assetProfileValuation.deleteMany(
+      {
         where: {
           id,
           symbolProfileId
         }
-      });
+      }
+    );
 
     return count > 0;
   }
