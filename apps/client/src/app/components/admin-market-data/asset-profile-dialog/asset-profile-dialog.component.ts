@@ -7,7 +7,10 @@ import {
   COMMENT_MAXIMUM_LENGTH,
   PROPERTY_IS_DATA_GATHERING_ENABLED
 } from '@ghostfolio/common/config';
-import { UpdateAssetProfileDto } from '@ghostfolio/common/dtos';
+import {
+  CreateAssetProfileValuationDto,
+  UpdateAssetProfileDto
+} from '@ghostfolio/common/dtos';
 import { ConfirmationDialogType } from '@ghostfolio/common/enums';
 import {
   canDeleteAssetProfile,
@@ -25,6 +28,7 @@ import {
   AdminMarketDataDetails,
   AssetClassSelectorOption,
   AssetProfileIdentifier,
+  AssetProfileValuation,
   HistoricalMetricPoint,
   LineChartItem,
   ScraperConfiguration,
@@ -42,7 +46,8 @@ import {
   AssetClass,
   AssetSubClass,
   DataGatheringFrequency,
-  DataSource
+  DataSource,
+  ValuationCategory
 } from '@ghostfolio/prisma/enums';
 import { GfCurrencySelectorComponent } from '@ghostfolio/ui/currency-selector';
 import { GfEntityLogoComponent } from '@ghostfolio/ui/entity-logo';
@@ -83,6 +88,7 @@ import {
   MatCheckboxChange,
   MatCheckboxModule
 } from '@angular/material/checkbox';
+import { DateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
   MAT_DIALOG_DATA,
@@ -110,7 +116,8 @@ import {
   readerOutline,
   serverOutline,
   statsChartOutline,
-  trashOutline
+  trashOutline,
+  trendingUpOutline
 } from 'ionicons/icons';
 import { isBoolean } from 'lodash-es';
 import ms from 'ms';
@@ -246,6 +253,16 @@ export class GfAssetProfileDialogComponent implements OnInit {
     }
   );
 
+  protected readonly assetProfileValuationForm = this.formBuilder.group({
+    category: new FormControl<ValuationCategory | null>(
+      null,
+      Validators.required
+    ),
+    date: new FormControl<Date | null>(null, Validators.required),
+    dividendYieldPercent: new FormControl<number | null>(null),
+    peRatio: new FormControl<number | null>(null)
+  });
+
   protected readonly BULLET_LIST_MAXIMUM_LENGTH = BULLET_LIST_MAXIMUM_LENGTH;
   protected readonly BUSINESS_DESCRIPTION_MAXIMUM_LENGTH =
     BUSINESS_DESCRIPTION_MAXIMUM_LENGTH;
@@ -332,6 +349,22 @@ export class GfAssetProfileDialogComponent implements OnInit {
 
   protected user: User;
 
+  protected readonly valuationCategoryOptions: {
+    id: ValuationCategory;
+    label: string;
+  }[] = [
+    ValuationCategory.UNDERVALUED,
+    ValuationCategory.FAIRLY_VALUED,
+    ValuationCategory.OVERVALUED
+  ].map((id) => {
+    return { id, label: translate(id) };
+  });
+
+  protected valuationScreenshot: { contentType: string; data: string } | null =
+    null;
+
+  protected valuations: AssetProfileValuation[] = [];
+
   private benchmarks: Partial<SymbolProfile>[];
 
   public constructor(
@@ -340,6 +373,7 @@ export class GfAssetProfileDialogComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     @Inject(MAT_DIALOG_DATA) protected data: AssetProfileDialogParams,
     private dataService: DataService,
+    private dateAdapter: DateAdapter<Date, string>,
     private destroyRef: DestroyRef,
     private dialogRef: MatDialogRef<
       GfAssetProfileDialogComponent,
@@ -360,7 +394,8 @@ export class GfAssetProfileDialogComponent implements OnInit {
       readerOutline,
       serverOutline,
       statsChartOutline,
-      trashOutline
+      trashOutline,
+      trendingUpOutline
     });
   }
 
@@ -374,6 +409,8 @@ export class GfAssetProfileDialogComponent implements OnInit {
     this.benchmarks = benchmarks;
     this.currencies = currencies;
     this.defaultDateFormat = getDateFormatString(this.data.locale);
+
+    this.dateAdapter.setLocale(this.data.locale);
 
     this.initialize();
   }
@@ -428,9 +465,10 @@ export class GfAssetProfileDialogComponent implements OnInit {
         symbol: this.data.symbol
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(({ assetProfile, marketData, splits }) => {
+      .subscribe(({ assetProfile, marketData, splits, valuations }) => {
         this.assetProfile = assetProfile;
         this.splits = splits ?? [];
+        this.valuations = valuations ?? [];
 
         this.assetClassLabel = translate(this.assetProfile?.assetClass ?? '');
         this.assetSubClassLabel = translate(
@@ -630,6 +668,105 @@ export class GfAssetProfileDialogComponent implements OnInit {
   protected onDeleteSplit(aId: string) {
     this.adminService
       .deleteAssetProfileSplit({
+        dataSource: this.data.dataSource,
+        id: aId,
+        symbol: this.data.symbol
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.initialize();
+      });
+  }
+
+  protected onValuationScreenshotSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+
+    if (!file) {
+      this.valuationScreenshot = null;
+
+      return;
+    }
+
+    this.readValuationScreenshotFile(file);
+  }
+
+  protected onValuationScreenshotPasted(event: ClipboardEvent) {
+    const target = event.target as HTMLElement;
+
+    if (target.closest('input, mat-select, textarea')) {
+      // Let the browser paste into the focused form control as usual
+      return;
+    }
+
+    const item = Array.from(event.clipboardData?.items ?? []).find(
+      ({ type }) => {
+        return type.startsWith('image/');
+      }
+    );
+
+    const file = item?.getAsFile();
+
+    if (!file) {
+      return;
+    }
+
+    event.preventDefault();
+
+    this.readValuationScreenshotFile(file);
+  }
+
+  protected onValuationFormClicked(
+    event: MouseEvent,
+    formElement: HTMLFormElement
+  ) {
+    const target = event.target as HTMLElement;
+
+    if (
+      target.closest(
+        'input, mat-select, button, textarea, .screenshot-drop-zone'
+      )
+    ) {
+      return;
+    }
+
+    formElement.focus();
+  }
+
+  protected onAddValuation() {
+    const { category, date, dividendYieldPercent, peRatio } =
+      this.assetProfileValuationForm.getRawValue();
+
+    if (!date || !category) {
+      return;
+    }
+
+    const valuation: CreateAssetProfileValuationDto = {
+      category,
+      date: format(date, DATE_FORMAT),
+      dividendYieldPercent: dividendYieldPercent ?? undefined,
+      peRatio: peRatio ?? undefined,
+      screenshot: this.valuationScreenshot?.data,
+      screenshotContentType: this.valuationScreenshot?.contentType
+    };
+
+    this.adminService
+      .postAssetProfileValuation({
+        valuation,
+        dataSource: this.data.dataSource,
+        symbol: this.data.symbol
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.assetProfileValuationForm.reset();
+        this.valuationScreenshot = null;
+
+        this.initialize();
+      });
+  }
+
+  protected onDeleteValuation(aId: string) {
+    this.adminService
+      .deleteAssetProfileValuation({
         dataSource: this.data.dataSource,
         id: aId,
         symbol: this.data.symbol
@@ -1059,5 +1196,19 @@ export class GfAssetProfileDialogComponent implements OnInit {
       },
       confirmType: ConfirmationDialogType.Primary
     });
+  }
+
+  private readValuationScreenshotFile(file: File) {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const [, data] = (reader.result as string).split(',');
+
+      this.valuationScreenshot = { data, contentType: file.type };
+
+      this.changeDetectorRef.markForCheck();
+    };
+
+    reader.readAsDataURL(file);
   }
 }

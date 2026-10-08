@@ -18,4 +18,27 @@
   .mat-mdc-dialog-title {
     padding-right: 0.5rem !important;
   }
+
+  .screenshot-drop-zone {
+    border: 1px dashed var(--mat-sys-outline, rgba(0, 0, 0, 0.2));
+    border-radius: 4px;
+    cursor: pointer;
+    min-height: 6rem;
+    outline: none;
+
+    &:focus,
+    &:hover {
+      border-color: var(--mat-sys-primary, currentColor);
+    }
+
+    .screenshot-drop-zone-preview {
+      max-height: 12rem;
+      max-width: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .valuation-screenshot {
+    max-width: 100%;
+  }
 }

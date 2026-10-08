@@ -5,6 +5,7 @@ import {
 } from '@ghostfolio/common/config';
 import {
   CreateAssetProfileSplitDto,
+  CreateAssetProfileValuationDto,
   CreatePlatformDto,
   MergeAssetProfileDto,
   UpdateAssetProfileDto,
@@ -16,6 +17,7 @@ import {
   AdminUserResponse,
   AdminUsersResponse,
   AssetProfileIdentifier,
+  AssetProfileValuation,
   DataProviderGhostfolioStatusResponse,
   DataProviderHistoricalResponse,
   EnhancedAssetProfile
@@ -72,6 +74,16 @@ export class AdminService {
   }: AssetProfileIdentifier & { id: string }) {
     return this.http.delete<void>(
       `/api/v1/asset-profiles/${dataSource}/${encodeURIComponent(symbol)}/splits/${id}`
+    );
+  }
+
+  public deleteAssetProfileValuation({
+    dataSource,
+    id,
+    symbol
+  }: AssetProfileIdentifier & { id: string }) {
+    return this.http.delete<void>(
+      `/api/v1/asset-profiles/${dataSource}/${encodeURIComponent(symbol)}/valuations/${id}`
     );
   }
 
@@ -263,6 +275,19 @@ export class AdminService {
     return this.http.post<AssetProfileSplit>(
       `/api/v1/asset-profiles/${dataSource}/${encodeURIComponent(symbol)}/splits`,
       split
+    );
+  }
+
+  public postAssetProfileValuation({
+    dataSource,
+    symbol,
+    valuation
+  }: AssetProfileIdentifier & {
+    valuation: CreateAssetProfileValuationDto;
+  }) {
+    return this.http.post<AssetProfileValuation>(
+      `/api/v1/asset-profiles/${dataSource}/${encodeURIComponent(symbol)}/valuations`,
+      valuation
     );
   }
 

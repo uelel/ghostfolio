@@ -592,6 +592,10 @@ export class DataService {
             item.date = parseISO(item.date);
           }
 
+          for (const item of data.valuations ?? []) {
+            item.date = parseISO(item.date);
+          }
+
           return data;
         })
       );

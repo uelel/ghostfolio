@@ -1,6 +1,7 @@
 import { ActivitiesService } from '@ghostfolio/api/app/activities/activities.service';
 import { PortfolioChangedEvent } from '@ghostfolio/api/events/portfolio-changed.event';
 import { AssetProfileSplitService } from '@ghostfolio/api/services/asset-profile-split/asset-profile-split.service';
+import { AssetProfileValuationService } from '@ghostfolio/api/services/asset-profile-valuation/asset-profile-valuation.service';
 import { BenchmarkService } from '@ghostfolio/api/services/benchmark/benchmark.service';
 import { DataProviderService } from '@ghostfolio/api/services/data-provider/data-provider.service';
 import { ExchangeRateDataService } from '@ghostfolio/api/services/exchange-rate-data/exchange-rate-data.service';
@@ -20,6 +21,7 @@ import {
   AssetProfileIdentifier,
   AssetProfileItem,
   AssetProfilesResponse,
+  AssetProfileValuation,
   DataProviderInfo,
   EnhancedAssetProfile,
   Filter
@@ -28,7 +30,14 @@ import { MarketDataPreset } from '@ghostfolio/common/types';
 
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { AssetClass, AssetSubClass, DataSource, Prisma } from '@prisma/client';
+import {
+  AssetClass,
+  AssetProfileValuation as PrismaAssetProfileValuation,
+  AssetSubClass,
+  DataSource,
+  Prisma,
+  ValuationCategory
+} from '@prisma/client';
 import { groupBy } from 'lodash-es';
 
 @Injectable()
@@ -38,6 +47,7 @@ export class AssetProfilesService {
   public constructor(
     private readonly activitiesService: ActivitiesService,
     private readonly assetProfileSplitService: AssetProfileSplitService,
+    private readonly assetProfileValuationService: AssetProfileValuationService,
     private readonly benchmarkService: BenchmarkService,
     private readonly dataGatheringService: DataGatheringService,
     private readonly dataProviderService: DataProviderService,
@@ -100,6 +110,53 @@ export class AssetProfilesService {
       symbol,
       symbolProfileId
     });
+  }
+
+  public async createValuation({
+    category,
+    date,
+    dividendYieldPercent,
+    peRatio,
+    screenshot,
+    screenshotContentType,
+    symbolProfileId
+  }: {
+    category: ValuationCategory;
+    date: Date;
+    dividendYieldPercent?: number;
+    peRatio?: number;
+    screenshot?: Buffer;
+    screenshotContentType?: string;
+    symbolProfileId: string;
+  }): Promise<AssetProfileValuation> {
+    const assetProfileValuation = await this.assetProfileValuationService.create({
+      category,
+      date,
+      dividendYieldPercent,
+      peRatio,
+      screenshot,
+      screenshotContentType,
+      symbolProfileId
+    });
+
+    return this.serializeValuation(assetProfileValuation);
+  }
+
+  public async deleteValuation({
+    id,
+    symbolProfileId
+  }: {
+    id: string;
+    symbolProfileId: string;
+  }) {
+    const isDeleted = await this.assetProfileValuationService.deleteById({
+      id,
+      symbolProfileId
+    });
+
+    if (!isDeleted) {
+      throw new NotFoundException();
+    }
   }
 
   /**
@@ -166,24 +223,29 @@ export class AssetProfilesService {
         await this.activitiesService.getStatisticsByCurrency(currency));
     }
 
-    const [[assetProfile], marketData, splits] = await Promise.all([
-      this.symbolProfileService.getSymbolProfiles([
-        {
+    const [[assetProfile], marketData, splits, valuations] =
+      await Promise.all([
+        this.symbolProfileService.getSymbolProfiles([
+          {
+            dataSource,
+            symbol
+          }
+        ]),
+        this.marketDataService.marketDataItems({
+          orderBy: {
+            date: 'asc'
+          },
+          where: {
+            dataSource,
+            symbol
+          }
+        }),
+        this.assetProfileSplitService.getSplits({ dataSource, symbol }),
+        this.assetProfileValuationService.getValuations({
           dataSource,
           symbol
-        }
-      ]),
-      this.marketDataService.marketDataItems({
-        orderBy: {
-          date: 'asc'
-        },
-        where: {
-          dataSource,
-          symbol
-        }
-      }),
-      this.assetProfileSplitService.getSplits({ dataSource, symbol })
-    ]);
+        })
+      ]);
 
     if (assetProfile) {
       assetProfile.dataProviderInfo = this.dataProviderService
@@ -194,6 +256,9 @@ export class AssetProfilesService {
     return {
       marketData,
       splits,
+      valuations: valuations.map((valuation) => {
+        return this.serializeValuation(valuation);
+      }),
       assetProfile: assetProfile ?? {
         activitiesCount,
         currency,
@@ -679,5 +744,20 @@ export class AssetProfilesService {
     });
 
     return this.prismaService.$extends(symbolProfileExtension);
+  }
+
+  /**
+   * Converts the screenshot of a valuation from bytes to a base64 string, so
+   * that it can be sent to the client as JSON
+   */
+  private serializeValuation(
+    valuation: PrismaAssetProfileValuation
+  ): AssetProfileValuation {
+    return {
+      ...valuation,
+      screenshot: valuation.screenshot
+        ? Buffer.from(valuation.screenshot).toString('base64')
+        : null
+    };
   }
 }

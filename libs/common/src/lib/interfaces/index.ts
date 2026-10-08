@@ -9,6 +9,7 @@ import type { AdminUser } from './admin-user.interface';
 import type { AssetClassSelectorOption } from './asset-class-selector-option.interface';
 import type { AssetProfileIdentifier } from './asset-profile-identifier.interface';
 import type { AssetProfileItem } from './asset-profile-item.interface';
+import type { AssetProfileValuation } from './asset-profile-valuation.interface';
 import type { BenchmarkProperty } from './benchmark-property.interface';
 import type { Benchmark } from './benchmark.interface';
 import type { Coupon } from './coupon.interface';
@@ -126,6 +127,7 @@ export {
   AssetProfileItem,
   AssetProfileResponse,
   AssetProfilesResponse,
+  AssetProfileValuation,
   AssetResponse,
   AttestationCredentialJSON,
   Benchmark,

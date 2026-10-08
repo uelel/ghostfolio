@@ -2,7 +2,14 @@ import { getDateFormatString } from '@ghostfolio/common/helper';
 
 import { inject, Service } from '@angular/core';
 import { MAT_DATE_LOCALE, NativeDateAdapter } from '@angular/material/core';
-import { addYears, format, getYear, parse } from 'date-fns';
+import { addYears, format, getYear, isValid, parse } from 'date-fns';
+
+/**
+ * Formats accepted as a fallback when a typed value does not match the
+ * locale's own date format, so that a day/month/year value such as
+ * "7.3.2026" (7 March 2026) is always understood regardless of locale.
+ */
+const FALLBACK_DATE_FORMATS = ['d.M.yyyy', 'd/M/yyyy', 'd-M-yyyy'];
 
 @Service({ autoProvided: false })
 export class CustomDateAdapter extends NativeDateAdapter {
@@ -27,6 +34,14 @@ export class CustomDateAdapter extends NativeDateAdapter {
    */
   public override parse(aValue: string): Date {
     let date = parse(aValue, getDateFormatString(this.locale), new Date());
+
+    for (const fallbackFormat of FALLBACK_DATE_FORMATS) {
+      if (isValid(date)) {
+        break;
+      }
+
+      date = parse(aValue, fallbackFormat, new Date());
+    }
 
     if (getYear(date) < 1900) {
       if (getYear(date) > Number(format(new Date(), 'yy')) + 1) {

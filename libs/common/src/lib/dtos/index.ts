@@ -5,6 +5,7 @@ import { CreateAccountBalanceDto } from './create-account-balance.dto';
 import { CreateAccountWithBalancesDto } from './create-account-with-balances.dto';
 import { CreateAccountDto } from './create-account.dto';
 import { CreateAssetProfileSplitDto } from './create-asset-profile-split.dto';
+import { CreateAssetProfileValuationDto } from './create-asset-profile-valuation.dto';
 import { CreateAssetProfileWithMarketDataDto } from './create-asset-profile-with-market-data.dto';
 import { CreateAssetProfileDto } from './create-asset-profile.dto';
 import { CreateOrderDto } from './create-order.dto';
@@ -41,6 +42,7 @@ export {
   CreateAccountWithBalancesDto,
   CreateAssetProfileDto,
   CreateAssetProfileSplitDto,
+  CreateAssetProfileValuationDto,
   CreateAssetProfileWithMarketDataDto,
   CreateOrderDto,
   CreatePlatformDto,

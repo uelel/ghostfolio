@@ -14,6 +14,9 @@ export const permissions = {
   createAssetProfileSplit: 'createAssetProfileSplit',
   createAssetProfileSplitOfOwnAssetProfile:
     'createAssetProfileSplitOfOwnAssetProfile',
+  createAssetProfileValuation: 'createAssetProfileValuation',
+  createAssetProfileValuationOfOwnAssetProfile:
+    'createAssetProfileValuationOfOwnAssetProfile',
   createMarketData: 'createMarketData',
   createMarketDataOfOwnAssetProfile: 'createMarketDataOfOwnAssetProfile',
   createOwnTag: 'createOwnTag',
@@ -28,6 +31,9 @@ export const permissions = {
   deleteAssetProfileSplit: 'deleteAssetProfileSplit',
   deleteAssetProfileSplitOfOwnAssetProfile:
     'deleteAssetProfileSplitOfOwnAssetProfile',
+  deleteAssetProfileValuation: 'deleteAssetProfileValuation',
+  deleteAssetProfileValuationOfOwnAssetProfile:
+    'deleteAssetProfileValuationOfOwnAssetProfile',
   deleteAuthDevice: 'deleteAuthDevice',
   deleteOwnUser: 'deleteOwnUser',
   deletePlatform: 'deletePlatform',
@@ -88,6 +94,8 @@ export function getPermissions(aRole: Role): string[] {
         permissions.deleteWatchlistItem,
         permissions.createAssetProfileSplit,
         permissions.createAssetProfileSplitOfOwnAssetProfile,
+        permissions.createAssetProfileValuation,
+        permissions.createAssetProfileValuationOfOwnAssetProfile,
         permissions.createMarketData,
         permissions.createMarketDataOfOwnAssetProfile,
         permissions.createOwnTag,
@@ -98,6 +106,8 @@ export function getPermissions(aRole: Role): string[] {
         permissions.deleteActivity,
         permissions.deleteAssetProfileSplit,
         permissions.deleteAssetProfileSplitOfOwnAssetProfile,
+        permissions.deleteAssetProfileValuation,
+        permissions.deleteAssetProfileValuationOfOwnAssetProfile,
         permissions.deleteAuthDevice,
         permissions.deletePlatform,
         permissions.deleteTag,
@@ -141,6 +151,7 @@ export function getPermissions(aRole: Role): string[] {
         // TODO: Grant createAssetProfileSplitOfOwnAssetProfile and
         // deleteAssetProfileSplitOfOwnAssetProfile once the stock splits
         // feature is no longer experimental
+        permissions.createAssetProfileValuationOfOwnAssetProfile,
         permissions.createMarketDataOfOwnAssetProfile,
         permissions.createOwnTag,
         permissions.createWatchlistItem,
@@ -148,6 +159,7 @@ export function getPermissions(aRole: Role): string[] {
         permissions.deleteAccount,
         permissions.deleteAccountBalance,
         permissions.deleteActivity,
+        permissions.deleteAssetProfileValuationOfOwnAssetProfile,
         permissions.deleteAuthDevice,
         permissions.deleteWatchlistItem,
         permissions.readAiPrompt,

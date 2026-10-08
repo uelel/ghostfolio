@@ -150,6 +150,23 @@ model AssetProfileSplit {
   @@index([date])
 }
 
+model AssetProfileValuation {
+  category              ValuationCategory
+  createdAt             DateTime          @default(now())
+  date                  DateTime
+  dividendYieldPercent  Float?
+  id                    String            @id @default(uuid())
+  peRatio               Float?
+  screenshot            Bytes?
+  screenshotContentType String?
+  symbolProfile         SymbolProfile     @relation(fields: [symbolProfileId], onDelete: Cascade, references: [id])
+  symbolProfileId       String
+  updatedAt             DateTime          @updatedAt
+
+  @@unique([symbolProfileId, date])
+  @@index([date])
+}
+
 model AuthDevice {
   createdAt           DateTime @default(now())
   credentialId        Bytes
@@ -234,25 +251,26 @@ model SymbolProfile {
   assetClass             AssetClass?
   assetProfileOverrides  AssetProfileOverrides?
   assetProfileSplits     AssetProfileSplit[]
+  assetProfileValuations AssetProfileValuation[]
   assetSubClass          AssetSubClass?
   businessDescription    String?
   comment                String?
   competitiveAdvantages  String?
   countries              Json?
-  createdAt              DateTime               @default(now())
+  createdAt              DateTime                @default(now())
   currency               String
   cusip                  String?
-  dataGatheringFrequency DataGatheringFrequency @default(DAILY)
+  dataGatheringFrequency DataGatheringFrequency  @default(DAILY)
   dataSource             DataSource
   figi                   String?
   figiComposite          String?
   figiShareClass         String?
-  historicalDps          Json?                  @default("[]")
-  historicalEps          Json?                  @default("[]")
-  historicalPayoutRatio  Json?                  @default("[]")
-  holdings               Json?                  @default("[]")
-  id                     String                 @id @default(uuid())
-  isActive               Boolean                @default(true)
+  historicalDps          Json?                   @default("[]")
+  historicalEps          Json?                   @default("[]")
+  historicalPayoutRatio  Json?                   @default("[]")
+  holdings               Json?                   @default("[]")
+  id                     String                  @id @default(uuid())
+  isActive               Boolean                 @default(true)
   isin                   String?
   name                   String?
   risks                  String?
@@ -261,11 +279,11 @@ model SymbolProfile {
   symbol                 String
   symbolMapping          Json?
   tailwinds              String?
-  updatedAt              DateTime               @updatedAt
+  updatedAt              DateTime                @updatedAt
   url                    String?
-  user                   User?                  @relation(fields: [userId], onDelete: Cascade, references: [id])
+  user                   User?                   @relation(fields: [userId], onDelete: Cascade, references: [id])
   userId                 String?
-  watchedBy              User[]                 @relation("UserWatchlist")
+  watchedBy              User[]                  @relation("UserWatchlist")
 
   @@unique([dataSource, symbol])
   @@index([assetClass])
@@ -418,6 +436,12 @@ enum Type {
   INTEREST
   LIABILITY
   SELL
+}
+
+enum ValuationCategory {
+  FAIRLY_VALUED
+  OVERVALUED
+  UNDERVALUED
 }
 
 enum ViewMode {

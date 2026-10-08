@@ -72,6 +72,11 @@ const locales = {
   ALL_TIME_HIGH: 'All time high',
   BEAR_MARKET: 'Bear market',
 
+  // ValuationCategory (enum)
+  FAIRLY_VALUED: $localize`:@@valuationCategory.FAIRLY_VALUED:Fairly Valued`,
+  OVERVALUED: $localize`:@@valuationCategory.OVERVALUED:Overvalued`,
+  UNDERVALUED: $localize`:@@valuationCategory.UNDERVALUED:Undervalued`,
+
   // Continents
   Africa: $localize`Africa`,
   Asia: $localize`Asia`,

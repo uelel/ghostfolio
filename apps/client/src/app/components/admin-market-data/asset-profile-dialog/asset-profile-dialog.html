@@ -599,6 +599,183 @@
       </mat-tab>
       <mat-tab>
         <ng-template mat-tab-label>
+          <ion-icon name="trending-up-outline" />
+          <div class="d-none d-sm-block ml-2" i18n>Valuation</div>
+        </ng-template>
+        <div class="container mt-3 p-0">
+          <div class="no-gutters row w-100">
+            <div class="col-12">
+              @if (valuations.length > 0) {
+                <div class="mb-3">
+                  @for (valuation of valuations; track valuation.id) {
+                    <div class="border mb-3 p-3 rounded">
+                      <div
+                        class="align-items-start d-flex justify-content-between"
+                      >
+                        <div>
+                          <div class="font-weight-bold">
+                            {{ valuation.date | date: defaultDateFormat }}
+                          </div>
+                          <div class="text-muted">
+                            @if (valuation.peRatio != null) {
+                              <span i18n>P/E Ratio</span>:
+                              {{ valuation.peRatio }}
+                              <br />
+                            }
+                            @if (valuation.dividendYieldPercent != null) {
+                              <span i18n>Dividend Yield</span>:
+                              {{ valuation.dividendYieldPercent }}%
+                              <br />
+                            }
+                            <span i18n>Category</span>:
+                            {{ translate(valuation.category) }}
+                          </div>
+                        </div>
+                        <button
+                          mat-icon-button
+                          type="button"
+                          [disabled]="!canEditAssetProfile"
+                          (click)="onDeleteValuation(valuation.id)"
+                        >
+                          <ion-icon name="trash-outline" />
+                        </button>
+                      </div>
+                      @if (valuation.screenshot) {
+                        <img
+                          class="d-block mt-2 mx-auto valuation-screenshot"
+                          [src]="
+                            'data:' +
+                            valuation.screenshotContentType +
+                            ';base64,' +
+                            valuation.screenshot
+                          "
+                        />
+                      }
+                    </div>
+                  }
+                </div>
+              }
+              <form
+                #valuationForm
+                tabindex="-1"
+                [formGroup]="assetProfileValuationForm"
+                (click)="onValuationFormClicked($event, valuationForm)"
+                (ngSubmit)="onAddValuation()"
+                (paste)="onValuationScreenshotPasted($event)"
+              >
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label i18n>Date</mat-label>
+                  <input
+                    formControlName="date"
+                    matInput
+                    [matDatepicker]="dateOfValuation"
+                  />
+                  <mat-datepicker-toggle
+                    class="mr-2"
+                    matSuffix
+                    [for]="dateOfValuation"
+                  >
+                    <ion-icon
+                      class="text-muted"
+                      matDatepickerToggleIcon
+                      name="calendar-clear-outline"
+                    />
+                  </mat-datepicker-toggle>
+                  <mat-datepicker #dateOfValuation />
+                </mat-form-field>
+                <mat-form-field
+                  appearance="outline"
+                  class="mb-3 w-100 without-hint"
+                >
+                  <mat-label i18n>Category</mat-label>
+                  <mat-select formControlName="category">
+                    @for (
+                      valuationCategoryOption of valuationCategoryOptions;
+                      track valuationCategoryOption.id
+                    ) {
+                      <mat-option [value]="valuationCategoryOption.id">{{
+                        valuationCategoryOption.label
+                      }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <div class="align-items-center d-flex mb-3">
+                  <mat-form-field
+                    appearance="outline"
+                    class="w-100 without-hint"
+                  >
+                    <mat-label i18n>P/E Ratio</mat-label>
+                    <input formControlName="peRatio" matInput type="number" />
+                  </mat-form-field>
+                  <div class="mx-2"></div>
+                  <mat-form-field
+                    appearance="outline"
+                    class="w-100 without-hint"
+                  >
+                    <mat-label i18n>Dividend Yield (%)</mat-label>
+                    <input
+                      formControlName="dividendYieldPercent"
+                      matInput
+                      type="number"
+                    />
+                  </mat-form-field>
+                </div>
+                <div class="mb-3">
+                  <label class="d-block mb-1" i18n
+                    >Screenshot of the Valuation Chart</label
+                  >
+                  <div
+                    class="align-items-center d-flex justify-content-center screenshot-drop-zone"
+                    role="button"
+                    tabindex="0"
+                    (click)="screenshotFileInput.click()"
+                    (keydown.enter)="screenshotFileInput.click()"
+                    (keydown.space)="screenshotFileInput.click()"
+                  >
+                    @if (valuationScreenshot) {
+                      <img
+                        class="screenshot-drop-zone-preview"
+                        [src]="
+                          'data:' +
+                          valuationScreenshot.contentType +
+                          ';base64,' +
+                          valuationScreenshot.data
+                        "
+                      />
+                    } @else {
+                      <div class="p-3 text-center text-muted" i18n>
+                        Click to select an image, or paste (Ctrl+V) anywhere in
+                        this form
+                      </div>
+                    }
+                  </div>
+                  <input
+                    #screenshotFileInput
+                    accept="image/png,image/jpeg,image/webp"
+                    class="d-none"
+                    type="file"
+                    (change)="onValuationScreenshotSelected($event)"
+                  />
+                </div>
+                <div class="text-center">
+                  <button
+                    color="primary"
+                    mat-flat-button
+                    type="submit"
+                    [disabled]="
+                      !assetProfileValuationForm.valid || !canEditAssetProfile
+                    "
+                  >
+                    <ng-container i18n>Add valuation</ng-container>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
           <ion-icon name="server-outline" />
           <div class="d-none d-sm-block ml-2" i18n>Historical Market Data</div>
         </ng-template>
