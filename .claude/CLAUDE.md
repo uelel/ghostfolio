@@ -16,3 +16,7 @@ This app allows maintenance of a dividend portfolio:
 - Configure a cron job to download up-to-date data for each company (prices, dividends, financial data).
 - Filter the portfolio by any data (sector, dates, valuation, dividends, etc.).
 - Portfolio overview — value evolution over time, dividend evolution over time, sector breakdown, etc.
+
+## Notes
+
+- [Universal findings for new features](https://claude.ai/code/artifact/875c00cc-8d8a-466d-be2b-ceda2832d057) — codebase gotchas learned while adding fork features
