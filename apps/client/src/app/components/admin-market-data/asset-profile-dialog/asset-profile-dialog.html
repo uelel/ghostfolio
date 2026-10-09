@@ -599,6 +599,25 @@
       </mat-tab>
       <mat-tab>
         <ng-template mat-tab-label>
+          <ion-icon name="podium-outline" />
+          <div class="d-none d-sm-block ml-2" i18n>Financials</div>
+        </ng-template>
+        <div class="container mt-3 p-0">
+          <div class="no-gutters row w-100">
+            <div class="col-12">
+              <gf-financials-table
+                [canEdit]="canEditAssetProfile"
+                [dataSource]="data.dataSource"
+                [financials]="financials"
+                [symbol]="data.symbol"
+                (changed)="initialize()"
+              />
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
           <ion-icon name="trending-up-outline" />
           <div class="d-none d-sm-block ml-2" i18n>Valuation</div>
         </ng-template>

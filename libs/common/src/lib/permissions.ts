@@ -11,6 +11,9 @@ export const permissions = {
   createAccountBalance: 'createAccountBalance',
   createActivity: 'createActivity',
   createApiKey: 'createApiKey',
+  createAssetProfileFinancials: 'createAssetProfileFinancials',
+  createAssetProfileFinancialsOfOwnAssetProfile:
+    'createAssetProfileFinancialsOfOwnAssetProfile',
   createAssetProfileSplit: 'createAssetProfileSplit',
   createAssetProfileSplitOfOwnAssetProfile:
     'createAssetProfileSplitOfOwnAssetProfile',
@@ -28,6 +31,9 @@ export const permissions = {
   deleteAccount: 'deleteAccount',
   deleteAccountBalance: 'deleteAccountBalance',
   deleteActivity: 'deleteActivity',
+  deleteAssetProfileFinancials: 'deleteAssetProfileFinancials',
+  deleteAssetProfileFinancialsOfOwnAssetProfile:
+    'deleteAssetProfileFinancialsOfOwnAssetProfile',
   deleteAssetProfileSplit: 'deleteAssetProfileSplit',
   deleteAssetProfileSplitOfOwnAssetProfile:
     'deleteAssetProfileSplitOfOwnAssetProfile',
@@ -68,6 +74,9 @@ export const permissions = {
   updateAccount: 'updateAccount',
   updateAccess: 'updateAccess',
   updateActivity: 'updateActivity',
+  updateAssetProfileFinancials: 'updateAssetProfileFinancials',
+  updateAssetProfileFinancialsOfOwnAssetProfile:
+    'updateAssetProfileFinancialsOfOwnAssetProfile',
   updateAuthDevice: 'updateAuthDevice',
   updateMarketData: 'updateMarketData',
   updateMarketDataOfOwnAssetProfile: 'updateMarketDataOfOwnAssetProfile',
@@ -92,6 +101,8 @@ export function getPermissions(aRole: Role): string[] {
         permissions.createWatchlistItem,
         permissions.deleteAccountBalance,
         permissions.deleteWatchlistItem,
+        permissions.createAssetProfileFinancials,
+        permissions.createAssetProfileFinancialsOfOwnAssetProfile,
         permissions.createAssetProfileSplit,
         permissions.createAssetProfileSplitOfOwnAssetProfile,
         permissions.createAssetProfileValuation,
@@ -104,6 +115,8 @@ export function getPermissions(aRole: Role): string[] {
         permissions.deleteAccess,
         permissions.deleteAccount,
         permissions.deleteActivity,
+        permissions.deleteAssetProfileFinancials,
+        permissions.deleteAssetProfileFinancialsOfOwnAssetProfile,
         permissions.deleteAssetProfileSplit,
         permissions.deleteAssetProfileSplitOfOwnAssetProfile,
         permissions.deleteAssetProfileValuation,
@@ -122,6 +135,8 @@ export function getPermissions(aRole: Role): string[] {
         permissions.updateAccount,
         permissions.updateAccess,
         permissions.updateActivity,
+        permissions.updateAssetProfileFinancials,
+        permissions.updateAssetProfileFinancialsOfOwnAssetProfile,
         permissions.updateAuthDevice,
         permissions.updateMarketData,
         permissions.updateMarketDataOfOwnAssetProfile,
@@ -151,6 +166,7 @@ export function getPermissions(aRole: Role): string[] {
         // TODO: Grant createAssetProfileSplitOfOwnAssetProfile and
         // deleteAssetProfileSplitOfOwnAssetProfile once the stock splits
         // feature is no longer experimental
+        permissions.createAssetProfileFinancialsOfOwnAssetProfile,
         permissions.createAssetProfileValuationOfOwnAssetProfile,
         permissions.createMarketDataOfOwnAssetProfile,
         permissions.createOwnTag,
@@ -159,6 +175,7 @@ export function getPermissions(aRole: Role): string[] {
         permissions.deleteAccount,
         permissions.deleteAccountBalance,
         permissions.deleteActivity,
+        permissions.deleteAssetProfileFinancialsOfOwnAssetProfile,
         permissions.deleteAssetProfileValuationOfOwnAssetProfile,
         permissions.deleteAuthDevice,
         permissions.deleteWatchlistItem,
@@ -169,6 +186,7 @@ export function getPermissions(aRole: Role): string[] {
         permissions.updateAccount,
         permissions.updateAccess,
         permissions.updateActivity,
+        permissions.updateAssetProfileFinancialsOfOwnAssetProfile,
         permissions.updateAuthDevice,
         permissions.updateMarketDataOfOwnAssetProfile,
         permissions.updateUserSettings,
