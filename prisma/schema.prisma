@@ -150,6 +150,38 @@ model AssetProfileSplit {
   @@index([date])
 }
 
+model AssetProfileFinancials {
+  capex                     Float?
+  capexScale                FinancialsScale?
+  cash                      Float?
+  cashScale                 FinancialsScale?
+  createdAt                 DateTime            @default(now())
+  currency                  FinancialsCurrency?
+  currentDebt               Float?
+  currentDebtScale          FinancialsScale?
+  date                      DateTime
+  debtRating                String?
+  dividendYieldPercent      Float?
+  dividendsPerShare         Float?
+  earningsGeographyRows     Json?
+  id                        String              @id @default(uuid())
+  longTermDebt              Float?
+  longTermDebtScale         FinancialsScale?
+  marketCap                 Float?
+  marketCapScale            FinancialsScale?
+  netIncome                 Float?
+  netIncomeScale            FinancialsScale?
+  netWorth                  Float?
+  netWorthScale             FinancialsScale?
+  revenueShareRows          Json?
+  symbolProfile             SymbolProfile       @relation(fields: [symbolProfileId], onDelete: Cascade, references: [id])
+  symbolProfileId           String
+  updatedAt                 DateTime            @updatedAt
+
+  @@unique([symbolProfileId, date])
+  @@index([date])
+}
+
 model AssetProfileValuation {
   category              ValuationCategory
   createdAt             DateTime          @default(now())
@@ -250,6 +282,7 @@ model SymbolProfile {
   activities             Order[]
   assetClass             AssetClass?
   assetProfileOverrides  AssetProfileOverrides?
+  assetProfileFinancials AssetProfileFinancials[]
   assetProfileSplits     AssetProfileSplit[]
   assetProfileValuations AssetProfileValuation[]
   assetSubClass          AssetSubClass?
@@ -408,6 +441,16 @@ enum DataSource {
   MANUAL
   RAPID_API
   YAHOO
+}
+
+enum FinancialsCurrency {
+  EUR
+  USD
+}
+
+enum FinancialsScale {
+  B
+  M
 }
 
 enum MarketDataState {

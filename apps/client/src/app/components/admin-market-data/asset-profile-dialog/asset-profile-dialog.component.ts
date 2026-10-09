@@ -27,6 +27,7 @@ import {
 import {
   AdminMarketDataDetails,
   AssetClassSelectorOption,
+  AssetProfileFinancials,
   AssetProfileIdentifier,
   AssetProfileValuation,
   HistoricalMetricPoint,
@@ -113,6 +114,7 @@ import {
   createOutline,
   ellipsisVertical,
   gitCompareOutline,
+  podiumOutline,
   readerOutline,
   serverOutline,
   statsChartOutline,
@@ -124,6 +126,7 @@ import ms from 'ms';
 import { EMPTY } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
+import { GfFinancialsTableComponent } from './financials-table/financials-table.component';
 import { GfHistoricalMetricEditorComponent } from './historical-metric-editor/historical-metric-editor.component';
 import { AssetProfileDialogParams } from './interfaces/interfaces';
 
@@ -135,6 +138,7 @@ import { AssetProfileDialogParams } from './interfaces/interfaces';
     FormsModule,
     GfCurrencySelectorComponent,
     GfEntityLogoComponent,
+    GfFinancialsTableComponent,
     GfHistoricalMarketDataEditorComponent,
     GfHistoricalMetricEditorComponent,
     GfLineChartComponent,
@@ -343,6 +347,8 @@ export class GfAssetProfileDialogComponent implements OnInit {
     [name: string]: { name: string; value: number };
   };
 
+  protected financials: AssetProfileFinancials[] = [];
+
   protected splits: AssetProfileSplit[] = [];
 
   protected readonly translate = translate;
@@ -391,6 +397,7 @@ export class GfAssetProfileDialogComponent implements OnInit {
       createOutline,
       ellipsisVertical,
       gitCompareOutline,
+      podiumOutline,
       readerOutline,
       serverOutline,
       statsChartOutline,
@@ -465,116 +472,122 @@ export class GfAssetProfileDialogComponent implements OnInit {
         symbol: this.data.symbol
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(({ assetProfile, marketData, splits, valuations }) => {
-        this.assetProfile = assetProfile;
-        this.splits = splits ?? [];
-        this.valuations = valuations ?? [];
+      .subscribe(
+        ({ assetProfile, financials, marketData, splits, valuations }) => {
+          this.assetProfile = assetProfile;
+          this.financials = financials ?? [];
+          this.splits = splits ?? [];
+          this.valuations = valuations ?? [];
 
-        this.assetClassLabel = translate(this.assetProfile?.assetClass ?? '');
-        this.assetSubClassLabel = translate(
-          this.assetProfile?.assetSubClass ?? ''
-        );
+          this.assetClassLabel = translate(this.assetProfile?.assetClass ?? '');
+          this.assetSubClassLabel = translate(
+            this.assetProfile?.assetSubClass ?? ''
+          );
 
-        this.canEditAssetProfile = !isCurrency(
-          getCurrencyFromSymbol(this.data.symbol)
-        );
+          this.canEditAssetProfile = !isCurrency(
+            getCurrencyFromSymbol(this.data.symbol)
+          );
 
-        this.countries = {};
+          this.countries = {};
 
-        this.isBenchmark = this.benchmarks.some(({ id }) => {
-          return id === this.assetProfile.id;
-        });
+          this.isBenchmark = this.benchmarks.some(({ id }) => {
+            return id === this.assetProfile.id;
+          });
 
-        this.historicalDataItems = marketData.map(({ date, marketPrice }) => {
-          return {
-            date: format(date, DATE_FORMAT),
-            value: marketPrice
-          };
-        });
-
-        this.marketDataItems = marketData;
-        this.sectors = {};
-
-        if (
-          this.assetProfile?.countries &&
-          this.assetProfile.countries.length > 0
-        ) {
-          for (const { code, weight } of this.assetProfile.countries) {
-            this.countries[code] = {
-              name: getCountryName({ code }),
-              value: weight
+          this.historicalDataItems = marketData.map(({ date, marketPrice }) => {
+            return {
+              date: format(date, DATE_FORMAT),
+              value: marketPrice
             };
-          }
-        }
+          });
 
-        if (
-          this.assetProfile?.sectors &&
-          this.assetProfile.sectors.length > 0
-        ) {
-          for (const { name, weight } of this.assetProfile.sectors) {
-            this.sectors[name] = {
-              name: translate(name),
-              value: weight
-            };
-          }
-        }
+          this.marketDataItems = marketData;
+          this.sectors = {};
 
-        this.assetProfileForm.setValue({
-          assetClass: this.assetProfile.assetClass ?? null,
-          assetSubClass: this.assetProfile.assetSubClass ?? null,
-          businessDescription: this.assetProfile?.businessDescription ?? '',
-          comment: this.assetProfile?.comment ?? '',
-          competitiveAdvantages: this.assetProfile?.competitiveAdvantages ?? '',
-          countries: JSON.stringify(
-            this.assetProfile?.countries?.map(({ code, weight }) => {
-              return { code, weight };
-            }) ?? []
-          ),
-          currency: this.assetProfile?.currency ?? null,
-          dataGatheringFrequency:
-            this.assetProfile?.dataGatheringFrequency ?? 'DAILY',
-          historicalData: {
-            csvString: GfAssetProfileDialogComponent.HISTORICAL_DATA_TEMPLATE
-          },
-          historicalDps: (this.assetProfile?.historicalDps ??
-            []) as HistoricalMetricPoint[],
-          historicalEps: (this.assetProfile?.historicalEps ??
-            []) as HistoricalMetricPoint[],
-          historicalPayoutRatio: (this.assetProfile?.historicalPayoutRatio ??
-            []) as HistoricalMetricPoint[],
-          isActive: isBoolean(this.assetProfile?.isActive)
-            ? this.assetProfile.isActive
-            : null,
-          name: this.assetProfile.name ?? this.assetProfile.symbol ?? null,
-          risks: this.assetProfile?.risks ?? '',
-          scraperConfiguration: {
-            defaultMarketPrice:
-              this.assetProfile?.scraperConfiguration?.defaultMarketPrice ??
-              null,
-            headers: JSON.stringify(
-              this.assetProfile?.scraperConfiguration?.headers ?? {}
+          if (
+            this.assetProfile?.countries &&
+            this.assetProfile.countries.length > 0
+          ) {
+            for (const { code, weight } of this.assetProfile.countries) {
+              this.countries[code] = {
+                name: getCountryName({ code }),
+                value: weight
+              };
+            }
+          }
+
+          if (
+            this.assetProfile?.sectors &&
+            this.assetProfile.sectors.length > 0
+          ) {
+            for (const { name, weight } of this.assetProfile.sectors) {
+              this.sectors[name] = {
+                name: translate(name),
+                value: weight
+              };
+            }
+          }
+
+          this.assetProfileForm.setValue({
+            assetClass: this.assetProfile.assetClass ?? null,
+            assetSubClass: this.assetProfile.assetSubClass ?? null,
+            businessDescription: this.assetProfile?.businessDescription ?? '',
+            comment: this.assetProfile?.comment ?? '',
+            competitiveAdvantages:
+              this.assetProfile?.competitiveAdvantages ?? '',
+            countries: JSON.stringify(
+              this.assetProfile?.countries?.map(({ code, weight }) => {
+                return { code, weight };
+              }) ?? []
             ),
-            locale: this.assetProfile?.scraperConfiguration?.locale ?? '',
-            mode: this.assetProfile?.scraperConfiguration?.mode ?? 'lazy',
-            selector: this.assetProfile?.scraperConfiguration?.selector ?? '',
-            url: this.assetProfile?.scraperConfiguration?.url ?? ''
-          },
-          sectors: JSON.stringify(this.assetProfile?.sectors ?? []),
-          symbolMapping: JSON.stringify(this.assetProfile?.symbolMapping ?? {}),
-          tailwinds: this.assetProfile?.tailwinds ?? '',
-          url: this.assetProfile?.url ?? ''
-        });
+            currency: this.assetProfile?.currency ?? null,
+            dataGatheringFrequency:
+              this.assetProfile?.dataGatheringFrequency ?? 'DAILY',
+            historicalData: {
+              csvString: GfAssetProfileDialogComponent.HISTORICAL_DATA_TEMPLATE
+            },
+            historicalDps: (this.assetProfile?.historicalDps ??
+              []) as HistoricalMetricPoint[],
+            historicalEps: (this.assetProfile?.historicalEps ??
+              []) as HistoricalMetricPoint[],
+            historicalPayoutRatio: (this.assetProfile?.historicalPayoutRatio ??
+              []) as HistoricalMetricPoint[],
+            isActive: isBoolean(this.assetProfile?.isActive)
+              ? this.assetProfile.isActive
+              : null,
+            name: this.assetProfile.name ?? this.assetProfile.symbol ?? null,
+            risks: this.assetProfile?.risks ?? '',
+            scraperConfiguration: {
+              defaultMarketPrice:
+                this.assetProfile?.scraperConfiguration?.defaultMarketPrice ??
+                null,
+              headers: JSON.stringify(
+                this.assetProfile?.scraperConfiguration?.headers ?? {}
+              ),
+              locale: this.assetProfile?.scraperConfiguration?.locale ?? '',
+              mode: this.assetProfile?.scraperConfiguration?.mode ?? 'lazy',
+              selector: this.assetProfile?.scraperConfiguration?.selector ?? '',
+              url: this.assetProfile?.scraperConfiguration?.url ?? ''
+            },
+            sectors: JSON.stringify(this.assetProfile?.sectors ?? []),
+            symbolMapping: JSON.stringify(
+              this.assetProfile?.symbolMapping ?? {}
+            ),
+            tailwinds: this.assetProfile?.tailwinds ?? '',
+            url: this.assetProfile?.url ?? ''
+          });
 
-        if (!this.canEditAssetProfile) {
-          this.assetProfileForm.disable();
+          if (!this.canEditAssetProfile) {
+            this.assetProfileForm.disable();
+          }
+
+          this.assetProfileForm.markAsPristine();
+
+          this.isLoading = false;
+
+          this.changeDetectorRef.markForCheck();
         }
-
-        this.assetProfileForm.markAsPristine();
-
-        this.isLoading = false;
-
-        this.changeDetectorRef.markForCheck();
-      });
+      );
   }
 
   protected onCancelEditAssetProfileIdentifierMode() {

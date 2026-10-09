@@ -7,6 +7,10 @@ import type { AdminJobs } from './admin-jobs.interface';
 import type { AdminMarketDataDetails } from './admin-market-data-details.interface';
 import type { AdminUser } from './admin-user.interface';
 import type { AssetClassSelectorOption } from './asset-class-selector-option.interface';
+import type {
+  AssetProfileFinancials,
+  FinancialsRow
+} from './asset-profile-financials.interface';
 import type { AssetProfileIdentifier } from './asset-profile-identifier.interface';
 import type { AssetProfileItem } from './asset-profile-item.interface';
 import type { AssetProfileValuation } from './asset-profile-valuation.interface';
@@ -123,6 +127,7 @@ export {
   ApiKeyResponse,
   AssertionCredentialJSON,
   AssetClassSelectorOption,
+  AssetProfileFinancials,
   AssetProfileIdentifier,
   AssetProfileItem,
   AssetProfileResponse,
@@ -148,6 +153,7 @@ export {
   ExportResponse,
   Filter,
   FilterGroup,
+  FinancialsRow,
   FireCalculationCompleteEvent,
   FireWealth,
   HistoricalDataItem,
