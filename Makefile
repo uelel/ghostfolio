@@ -23,4 +23,5 @@ stop-dev:
 	$(COMPOSE_DEV) down
 
 migrate:
+	$(COMPOSE_DEV) up -d --wait postgres
 	@. $$HOME/.nvm/nvm.sh && nvm use 22 && npm run database:migrate
