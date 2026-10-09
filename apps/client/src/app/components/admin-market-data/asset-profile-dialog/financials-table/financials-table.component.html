@@ -1,0 +1,253 @@
+<div class="financials-table-wrapper">
+  <table class="gf-table" mat-table [dataSource]="rows" [trackBy]="trackRow">
+    <!-- Top title row: "Fiscal year" spanning the full width -->
+    <ng-container matColumnDef="fiscalYearTitle">
+      <th
+        *matHeaderCellDef
+        class="section-header"
+        mat-header-cell
+        [attr.colspan]="displayedColumns.length"
+      >
+        <ng-container i18n>Fiscal year</ng-container>
+      </th>
+    </ng-container>
+
+    <!-- Metric label column (sticky left) -->
+    <ng-container matColumnDef="label" sticky>
+      <th *matHeaderCellDef class="metric-label" mat-header-cell>
+        <ng-container i18n>Fiscal year end</ng-container>
+      </th>
+      <td *matCellDef="let row" class="metric-label" mat-cell>
+        @switch (row.kind) {
+          @case ('currency') {
+            <ng-container i18n>Currency</ng-container>
+          }
+          @case ('dynamic') {
+            <div class="d-flex align-items-center">
+              <input
+                class="form-control form-control-sm flex-grow-1"
+                i18n-placeholder
+                placeholder="Name"
+                type="text"
+                [disabled]="!canEdit"
+                [value]="
+                  dynamicRowNameControl(row.section, row.rowIndex)?.value ?? ''
+                "
+                (input)="
+                  onDynamicRowNameChange(
+                    row.section,
+                    row.rowIndex,
+                    $any($event.target).value
+                  )
+                "
+              />
+              <button
+                aria-label="Remove row"
+                i18n-aria-label
+                mat-icon-button
+                type="button"
+                [disabled]="!canEdit"
+                (click)="onRemoveDynamicRow(row.section, row.rowIndex)"
+              >
+                <ion-icon name="trash-outline" />
+              </button>
+            </div>
+          }
+          @case ('money') {
+            {{ row.label }}
+          }
+          @case ('text') {
+            {{ row.label }}
+          }
+          @case ('number') {
+            {{ row.label }}
+          }
+          @case ('delete') {}
+        }
+      </td>
+    </ng-container>
+
+    <!-- One matColumnDef per snapshot -->
+    @for (column of columns; track column.id) {
+      <ng-container [matColumnDef]="columnId(column)">
+        <th *matHeaderCellDef class="snapshot-header" mat-header-cell>
+          <input
+            class="form-control form-control-sm date-input"
+            readonly
+            [formControl]="column.form.controls.date"
+            [matDatepicker]="headerDatePicker"
+            (click)="headerDatePicker.open()"
+          />
+          <mat-datepicker #headerDatePicker></mat-datepicker>
+        </th>
+        <td *matCellDef="let row" class="snapshot-cell" mat-cell>
+          @switch (row.kind) {
+            @case ('currency') {
+              <select
+                class="form-select form-select-sm"
+                [formControl]="column.form.controls.currency"
+              >
+                @for (option of currencyOptions; track option) {
+                  <option [ngValue]="option">{{ option }}</option>
+                }
+              </select>
+            }
+            @case ('dynamic') {
+              @if (
+                dynamicPercentControl(column, row.section, row.rowIndex);
+                as percentControl
+              ) {
+                <div class="percent-input-wrapper">
+                  <input
+                    class="form-control form-control-sm"
+                    step="any"
+                    type="number"
+                    [formControl]="percentControl"
+                  />
+                  <span class="percent-suffix">%</span>
+                </div>
+              }
+            }
+            @case ('money') {
+              <div class="d-flex align-items-center">
+                <input
+                  class="form-control form-control-sm flex-grow-1 money-input"
+                  step="any"
+                  type="number"
+                  [formControl]="$any(column.form.controls[row.valueControl])"
+                />
+                <select
+                  class="form-select form-select-sm scale-select"
+                  [formControl]="$any(column.form.controls[row.scaleControl])"
+                >
+                  <option [ngValue]="null"></option>
+                  @for (option of scaleOptions; track option) {
+                    <option [ngValue]="option">{{ option }}</option>
+                  }
+                </select>
+              </div>
+            }
+            @case ('text') {
+              <input
+                class="form-control form-control-sm"
+                type="text"
+                [formControl]="column.form.controls.debtRating"
+              />
+            }
+            @case ('number') {
+              @if (row.control === 'dividendYieldPercent') {
+                <div class="percent-input-wrapper">
+                  <input
+                    class="form-control form-control-sm"
+                    step="any"
+                    type="number"
+                    [formControl]="$any(column.form.controls[row.control])"
+                  />
+                  <span class="percent-suffix">%</span>
+                </div>
+              } @else {
+                <input
+                  class="form-control form-control-sm"
+                  step="any"
+                  type="number"
+                  [formControl]="$any(column.form.controls[row.control])"
+                />
+              }
+            }
+            @case ('delete') {
+              <div class="d-flex justify-content-center">
+                <button
+                  aria-label="Delete column"
+                  i18n-aria-label
+                  mat-icon-button
+                  type="button"
+                  [disabled]="!canEdit"
+                  (click)="onDeleteColumn(column)"
+                >
+                  <ion-icon name="trash-outline" />
+                </button>
+              </div>
+            }
+          }
+        </td>
+      </ng-container>
+    }
+
+    <!-- Add-column (last column; "+" in the header) -->
+    <ng-container matColumnDef="add">
+      <th *matHeaderCellDef class="add-column-header" mat-header-cell>
+        <button
+          aria-label="Add column"
+          color="primary"
+          i18n-aria-label
+          mat-icon-button
+          type="button"
+          [disabled]="!canEdit"
+          (click)="onAddColumn()"
+        >
+          <ion-icon name="add-outline" />
+        </button>
+      </th>
+      <td *matCellDef="let _" mat-cell></td>
+    </ng-container>
+
+    <!-- Section header row (spans full width via one colspan cell) -->
+    <ng-container matColumnDef="sectionCell">
+      <td
+        *matCellDef="let row"
+        class="section-header"
+        mat-cell
+        [attr.colspan]="displayedColumns.length"
+      >
+        {{ row.label }}
+      </td>
+    </ng-container>
+
+    <!-- Add-row row (one spanning cell with [+ row] button) -->
+    <ng-container matColumnDef="addRowCell">
+      <td
+        *matCellDef="let row"
+        class="add-row-cell"
+        mat-cell
+        [attr.colspan]="displayedColumns.length"
+      >
+        <button
+          mat-stroked-button
+          type="button"
+          [disabled]="!canEdit"
+          (click)="onAddDynamicRow(row.section)"
+        >
+          <ion-icon name="add-outline" />
+          <ng-container i18n>Add row</ng-container>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr
+      *matHeaderRowDef="['fiscalYearTitle']; sticky: true"
+      class="section-row"
+      mat-header-row
+    ></tr>
+    <tr *matHeaderRowDef="displayedColumns; sticky: true" mat-header-row></tr>
+    <tr
+      *matRowDef="let row; columns: displayedColumns; when: isStandardRow"
+      mat-row
+    ></tr>
+    <tr
+      *matRowDef="let row; columns: ['sectionCell']; when: isSectionRow"
+      class="section-row"
+      mat-row
+    ></tr>
+    <tr
+      *matRowDef="let row; columns: ['addRowCell']; when: isAddRow"
+      class="add-row-row"
+      mat-row
+    ></tr>
+  </table>
+
+  @if (columns.length === 0) {
+    <div class="empty-state mt-3 text-center text-muted" i18n>
+      No financials snapshots yet. Click the + button to add the first column.
+    </div>
+  }
+</div>

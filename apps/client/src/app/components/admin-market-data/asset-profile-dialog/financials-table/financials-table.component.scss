@@ -1,0 +1,156 @@
+:host {
+  display: block;
+}
+
+.financials-table-wrapper {
+  overflow-x: scroll;
+  scrollbar-color: rgba(128, 128, 128, 0.5) transparent;
+  scrollbar-width: thin;
+  width: 100%;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(128, 128, 128, 0.5);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+:host .gf-table {
+  table-layout: fixed;
+
+  .mat-mdc-cell,
+  .mat-mdc-header-cell {
+    border-right: 1px solid
+      rgba(
+        var(--palette-foreground-divider),
+        var(--palette-foreground-divider-alpha)
+      );
+    padding: 0.25rem 0.5rem;
+
+    &:last-child {
+      border-right: none;
+    }
+  }
+
+  .section-header,
+  .add-row-cell {
+    border-right: none;
+  }
+
+  .form-control,
+  .form-select {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    box-sizing: border-box;
+    display: block;
+    font-size: 0.875rem;
+    max-width: 100%;
+    min-width: 0;
+    padding: 0.25rem 0.5rem;
+    text-align: center;
+    transition: border-color 150ms ease;
+    width: 100%;
+
+    &:focus,
+    &:hover {
+      border-color: rgba(128, 128, 128, 0.4);
+      box-shadow: none;
+      outline: none;
+    }
+  }
+
+  input.form-control[type='number'] {
+    -moz-appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      appearance: none;
+      margin: 0;
+    }
+  }
+
+  .money-input {
+    text-align: left;
+  }
+
+  .percent-input-wrapper {
+    position: relative;
+
+    .form-control {
+      padding-right: 1.25rem;
+    }
+
+    .percent-suffix {
+      color: rgba(var(--palette-foreground-secondary-text));
+      font-size: 0.75rem;
+      pointer-events: none;
+      position: absolute;
+      right: 0.4rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+
+  .snapshot-cell {
+    overflow: hidden;
+  }
+
+  .date-input {
+    cursor: pointer;
+    text-align: center;
+    width: 100%;
+  }
+
+  .metric-label {
+    background: var(--mat-sys-surface, inherit);
+    font-weight: 500;
+    max-width: 220px;
+    min-width: 160px;
+    width: 220px;
+  }
+
+  .snapshot-header,
+  .snapshot-cell {
+    max-width: 180px;
+    min-width: 180px;
+    width: 180px;
+  }
+
+  .add-column-header {
+    min-width: 3rem;
+    text-align: center;
+  }
+
+  .scale-select {
+    flex: 0 0 auto;
+    margin-left: 0;
+    width: 3.5rem;
+  }
+
+  .section-row .section-header {
+    background: rgba(var(--palette-foreground-base), 0.04);
+    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+  }
+
+  .add-row-row.mat-mdc-row {
+    background-color: var(--mat-sys-surface, inherit) !important;
+
+    &:hover {
+      background-color: var(--mat-sys-surface, inherit) !important;
+    }
+  }
+
+  .add-row-row .add-row-cell {
+    padding: 0.15rem 0.5rem;
+    text-align: center;
+  }
+}

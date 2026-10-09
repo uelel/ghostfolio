@@ -24,4 +24,4 @@ stop-dev:
 
 migrate:
 	$(COMPOSE_DEV) up -d --wait postgres
-	@. $$HOME/.nvm/nvm.sh && nvm use 22 && npm run database:push && npm run database:generate-typings
+	@unset NPM_CONFIG_PREFIX && . $$HOME/.nvm/nvm.sh && nvm use 22 && npm run database:push && npm run database:generate-typings

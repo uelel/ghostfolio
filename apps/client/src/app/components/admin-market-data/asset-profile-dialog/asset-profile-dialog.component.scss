@@ -1,6 +1,26 @@
 :host {
   display: block;
 
+  .mat-mdc-tab-label-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(var(--palette-foreground-secondary-text));
+      border-radius: 2px;
+    }
+  }
+
+  .mat-mdc-tab-list {
+    transform: none !important;
+    transition: none !important;
+  }
+
   .mat-mdc-dialog-content {
     max-height: unset;
 

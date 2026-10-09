@@ -6,13 +6,16 @@ import { TransformDataSourceInResponseInterceptor } from '@ghostfolio/api/interc
 import { ApiService } from '@ghostfolio/api/services/api/api.service';
 import { SymbolProfileService } from '@ghostfolio/api/services/symbol-profile/symbol-profile.service';
 import {
+  CreateAssetProfileFinancialsDto,
   CreateAssetProfileSplitDto,
   CreateAssetProfileValuationDto,
-  UpdateAssetProfileDataDto
+  UpdateAssetProfileDataDto,
+  UpdateAssetProfileFinancialsDto
 } from '@ghostfolio/common/dtos';
 import { getCurrencyFromSymbol, isCurrency } from '@ghostfolio/common/helper';
 import { AssetProfileResponse } from '@ghostfolio/common/interfaces';
 import {
+  AssetProfileFinancials,
   AssetProfilesResponse,
   AssetProfileValuation,
   EnhancedAssetProfile
@@ -208,6 +211,74 @@ export class AssetProfilesController {
         ? Buffer.from(data.screenshot, 'base64')
         : undefined,
       screenshotContentType: data.screenshotContentType
+    });
+  }
+
+  @Post(':dataSource/:symbol/financials')
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(TransformDataSourceInRequestInterceptor)
+  public async createFinancials(
+    @Body() data: CreateAssetProfileFinancialsDto,
+    @Param('dataSource') dataSource: DataSource,
+    @Param('symbol') symbol: string
+  ): Promise<AssetProfileFinancials> {
+    const { id: symbolProfileId } = await this.validateAccessToAssetProfile({
+      dataSource,
+      symbol,
+      permission: permissions.createAssetProfileFinancials,
+      permissionOfOwnAssetProfile:
+        permissions.createAssetProfileFinancialsOfOwnAssetProfile
+    });
+
+    return this.assetProfilesService.createFinancials({
+      symbolProfileId,
+      date: parseISO(data.date)
+    });
+  }
+
+  @Patch(':dataSource/:symbol/financials/:id')
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(TransformDataSourceInRequestInterceptor)
+  public async updateFinancials(
+    @Body() data: UpdateAssetProfileFinancialsDto,
+    @Param('dataSource') dataSource: DataSource,
+    @Param('id') id: string,
+    @Param('symbol') symbol: string
+  ): Promise<AssetProfileFinancials> {
+    const { id: symbolProfileId } = await this.validateAccessToAssetProfile({
+      dataSource,
+      symbol,
+      permission: permissions.updateAssetProfileFinancials,
+      permissionOfOwnAssetProfile:
+        permissions.updateAssetProfileFinancialsOfOwnAssetProfile
+    });
+
+    return this.assetProfilesService.updateFinancials({
+      data,
+      id,
+      symbolProfileId
+    });
+  }
+
+  @Delete(':dataSource/:symbol/financials/:id')
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(TransformDataSourceInRequestInterceptor)
+  public async deleteFinancials(
+    @Param('dataSource') dataSource: DataSource,
+    @Param('id') id: string,
+    @Param('symbol') symbol: string
+  ): Promise<void> {
+    const { id: symbolProfileId } = await this.validateAccessToAssetProfile({
+      dataSource,
+      symbol,
+      permission: permissions.deleteAssetProfileFinancials,
+      permissionOfOwnAssetProfile:
+        permissions.deleteAssetProfileFinancialsOfOwnAssetProfile
+    });
+
+    return this.assetProfilesService.deleteFinancials({
+      id,
+      symbolProfileId
     });
   }
 
