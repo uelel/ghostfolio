@@ -22,7 +22,10 @@
       "Bash(docker run *)",
       "Bash(sed *)",
       "Bash(npx *)",
-      "Bash(npm *)"
+      "Bash(npm *)",
+      "Bash(git checkout *)",
+      "mcp__claude_ai_Claude_Docs__guide",
+      "mcp__claude_ai_Claude_Docs__read"
     ],
     "deny": [],
     "ask": [],
