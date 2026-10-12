@@ -219,6 +219,10 @@ export class GfAssetProfileDialogComponent implements OnInit {
       url: ''
     }),
     sectors: ['', jsonValidator()],
+    sharesOutstandingScreenshot: new FormControl<string | null>(null),
+    sharesOutstandingScreenshotContentType: new FormControl<string | null>(
+      null
+    ),
     symbolMapping: ['', jsonValidator()],
     tailwinds: '',
     url: ''
@@ -570,6 +574,10 @@ export class GfAssetProfileDialogComponent implements OnInit {
               url: this.assetProfile?.scraperConfiguration?.url ?? ''
             },
             sectors: JSON.stringify(this.assetProfile?.sectors ?? []),
+            sharesOutstandingScreenshot:
+              this.assetProfile?.sharesOutstandingScreenshot ?? null,
+            sharesOutstandingScreenshotContentType:
+              this.assetProfile?.sharesOutstandingScreenshotContentType ?? null,
             symbolMapping: JSON.stringify(
               this.assetProfile?.symbolMapping ?? {}
             ),
@@ -726,6 +734,47 @@ export class GfAssetProfileDialogComponent implements OnInit {
     event.preventDefault();
 
     this.readValuationScreenshotFile(file);
+  }
+
+  protected onSharesOutstandingScreenshotSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+
+    if (!file) {
+      this.setSharesOutstandingScreenshot(null);
+
+      return;
+    }
+
+    this.readImageFileAsBase64(file).then(({ contentType, data }) => {
+      this.setSharesOutstandingScreenshot({ contentType, data });
+    });
+  }
+
+  protected onSharesOutstandingScreenshotPasted(event: ClipboardEvent) {
+    const target = event.target as HTMLElement;
+
+    if (target.closest('input, mat-select, textarea')) {
+      // Let the browser paste into the focused form control as usual
+      return;
+    }
+
+    const item = Array.from(event.clipboardData?.items ?? []).find(
+      ({ type }) => {
+        return type.startsWith('image/');
+      }
+    );
+
+    const file = item?.getAsFile();
+
+    if (!file) {
+      return;
+    }
+
+    event.preventDefault();
+
+    this.readImageFileAsBase64(file).then(({ contentType, data }) => {
+      this.setSharesOutstandingScreenshot({ contentType, data });
+    });
   }
 
   protected onValuationFormClicked(
@@ -913,6 +962,11 @@ export class GfAssetProfileDialogComponent implements OnInit {
         : undefined,
       name: this.assetProfileForm.controls.name.value ?? undefined,
       risks: getStringOrNull(this.assetProfileForm.controls.risks.value),
+      sharesOutstandingScreenshot:
+        this.assetProfileForm.controls.sharesOutstandingScreenshot.value,
+      sharesOutstandingScreenshotContentType:
+        this.assetProfileForm.controls.sharesOutstandingScreenshotContentType
+          .value,
       tailwinds: getStringOrNull(
         this.assetProfileForm.controls.tailwinds.value
       ),
@@ -1212,16 +1266,41 @@ export class GfAssetProfileDialogComponent implements OnInit {
   }
 
   private readValuationScreenshotFile(file: File) {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const [, data] = (reader.result as string).split(',');
-
-      this.valuationScreenshot = { data, contentType: file.type };
+    this.readImageFileAsBase64(file).then(({ contentType, data }) => {
+      this.valuationScreenshot = { contentType, data };
 
       this.changeDetectorRef.markForCheck();
-    };
+    });
+  }
 
-    reader.readAsDataURL(file);
+  private readImageFileAsBase64(
+    file: File
+  ): Promise<{ contentType: string; data: string }> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const [, data] = (reader.result as string).split(',');
+
+        resolve({ data, contentType: file.type });
+      };
+
+      reader.onerror = reject;
+
+      reader.readAsDataURL(file);
+    });
+  }
+
+  private setSharesOutstandingScreenshot(
+    aScreenshot: { contentType: string; data: string } | null
+  ) {
+    this.assetProfileForm.patchValue({
+      sharesOutstandingScreenshot: aScreenshot?.data ?? null,
+      sharesOutstandingScreenshotContentType: aScreenshot?.contentType ?? null
+    });
+
+    this.assetProfileForm.controls.sharesOutstandingScreenshot.markAsDirty();
+
+    this.changeDetectorRef.markForCheck();
   }
 }

@@ -41,6 +41,8 @@ export interface EnhancedAssetProfile {
   risks?: string;
   scraperConfiguration?: ScraperConfiguration;
   sectors: Sector[];
+  sharesOutstandingScreenshot?: string | null;
+  sharesOutstandingScreenshotContentType?: string | null;
   symbol: string;
   symbolMapping?: { [key: string]: string };
   tailwinds?: string;

@@ -222,6 +222,8 @@ export class SymbolProfileService {
       risks,
       scraperConfiguration,
       sectors,
+      sharesOutstandingScreenshot,
+      sharesOutstandingScreenshotContentType,
       symbolMapping,
       tailwinds,
       url
@@ -247,6 +249,8 @@ export class SymbolProfileService {
         risks,
         scraperConfiguration,
         sectors,
+        sharesOutstandingScreenshot,
+        sharesOutstandingScreenshotContentType,
         symbolMapping,
         tailwinds,
         url
@@ -295,6 +299,12 @@ export class SymbolProfileService {
         sectors: this.getSectors(
           symbolProfileWithOverrides?.sectors as unknown as Prisma.JsonArray
         ),
+        sharesOutstandingScreenshot:
+          symbolProfileWithOverrides?.sharesOutstandingScreenshot
+            ? Buffer.from(
+                symbolProfileWithOverrides.sharesOutstandingScreenshot
+              ).toString('base64')
+            : null,
         symbolMapping: this.getSymbolMapping(symbolProfileWithOverrides),
         watchedByCount: 0
       };

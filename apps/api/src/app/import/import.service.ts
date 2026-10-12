@@ -947,6 +947,8 @@ export class ImportService {
             historicalEps: assetProfile.historicalEps ?? [],
             historicalPayoutRatio: assetProfile.historicalPayoutRatio ?? [],
             risks: assetProfile.risks,
+            sharesOutstandingScreenshot: null,
+            sharesOutstandingScreenshotContentType: null,
             tailwinds: assetProfile.tailwinds,
             userId: dataSource === 'MANUAL' ? user.id : undefined
           },
