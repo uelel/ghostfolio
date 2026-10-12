@@ -6,18 +6,24 @@ services:
     extends:
       file: docker-compose.yml
       service: ghostfolio
+    env_file:
+      - ../.env.prod
 
   postgres:
     container_name: gf-postgres-build
     extends:
       file: docker-compose.yml
       service: postgres
+    env_file:
+      - ../.env.prod
 
   redis:
     container_name: gf-redis-build
     extends:
       file: docker-compose.yml
       service: redis
+    env_file:
+      - ../.env.prod
 
 volumes:
   postgres:
