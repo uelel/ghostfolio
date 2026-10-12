@@ -31,6 +31,8 @@ export interface ExportResponse {
     | 'dataGatheringFrequency'
     | 'id'
     | 'scraperConfiguration'
+    | 'sharesOutstandingScreenshot'
+    | 'sharesOutstandingScreenshotContentType'
     | 'symbolMapping'
     | 'updatedAt'
     | 'userId'

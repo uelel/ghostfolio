@@ -279,44 +279,46 @@ model Settings {
 }
 
 model SymbolProfile {
-  activities             Order[]
-  assetClass             AssetClass?
-  assetProfileOverrides  AssetProfileOverrides?
-  assetProfileFinancials AssetProfileFinancials[]
-  assetProfileSplits     AssetProfileSplit[]
-  assetProfileValuations AssetProfileValuation[]
-  assetSubClass          AssetSubClass?
-  businessDescription    String?
-  comment                String?
-  competitiveAdvantages  String?
-  countries              Json?
-  createdAt              DateTime                @default(now())
-  currency               String
-  cusip                  String?
-  dataGatheringFrequency DataGatheringFrequency  @default(DAILY)
-  dataSource             DataSource
-  figi                   String?
-  figiComposite          String?
-  figiShareClass         String?
-  historicalDps          Json?                   @default("[]")
-  historicalEps          Json?                   @default("[]")
-  historicalPayoutRatio  Json?                   @default("[]")
-  holdings               Json?                   @default("[]")
-  id                     String                  @id @default(uuid())
-  isActive               Boolean                 @default(true)
-  isin                   String?
-  name                   String?
-  risks                  String?
-  scraperConfiguration   Json?
-  sectors                Json?
-  symbol                 String
-  symbolMapping          Json?
-  tailwinds              String?
-  updatedAt              DateTime                @updatedAt
-  url                    String?
-  user                   User?                   @relation(fields: [userId], onDelete: Cascade, references: [id])
-  userId                 String?
-  watchedBy              User[]                  @relation("UserWatchlist")
+  activities                             Order[]
+  assetClass                             AssetClass?
+  assetProfileOverrides                  AssetProfileOverrides?
+  assetProfileFinancials                 AssetProfileFinancials[]
+  assetProfileSplits                     AssetProfileSplit[]
+  assetProfileValuations                 AssetProfileValuation[]
+  assetSubClass                          AssetSubClass?
+  businessDescription                    String?
+  comment                                String?
+  competitiveAdvantages                  String?
+  countries                              Json?
+  createdAt                              DateTime                 @default(now())
+  currency                               String
+  cusip                                  String?
+  dataGatheringFrequency                 DataGatheringFrequency   @default(DAILY)
+  dataSource                             DataSource
+  figi                                   String?
+  figiComposite                          String?
+  figiShareClass                         String?
+  historicalDps                          Json?                    @default("[]")
+  historicalEps                          Json?                    @default("[]")
+  historicalPayoutRatio                  Json?                    @default("[]")
+  holdings                               Json?                    @default("[]")
+  id                                     String                   @id @default(uuid())
+  isActive                               Boolean                  @default(true)
+  isin                                   String?
+  name                                   String?
+  risks                                  String?
+  scraperConfiguration                   Json?
+  sectors                                Json?
+  sharesOutstandingScreenshot            Bytes?
+  sharesOutstandingScreenshotContentType String?
+  symbol                                 String
+  symbolMapping                          Json?
+  tailwinds                              String?
+  updatedAt                              DateTime                 @updatedAt
+  url                                    String?
+  user                                   User?                    @relation(fields: [userId], onDelete: Cascade, references: [id])
+  userId                                 String?
+  watchedBy                              User[]                   @relation("UserWatchlist")
 
   @@unique([dataSource, symbol])
   @@index([assetClass])

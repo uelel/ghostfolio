@@ -587,7 +587,7 @@
             [locale]="data.locale"
           />
           <gf-historical-metric-editor
-            class="d-block"
+            class="d-block mb-4"
             formControlName="historicalPayoutRatio"
             i18n-label
             label="Dividend Payout Ratio"
@@ -595,6 +595,47 @@
             [colorScheme]="user?.settings?.colorScheme"
             [locale]="data.locale"
           />
+          <div (paste)="onSharesOutstandingScreenshotPasted($event)">
+            <div class="h5" i18n>Shares Outstanding</div>
+            <label class="d-block mb-1" i18n
+              >Screenshot of Shares Outstanding</label
+            >
+            <div
+              class="align-items-center d-flex justify-content-center screenshot-drop-zone"
+              role="button"
+              tabindex="0"
+              (click)="sharesOutstandingScreenshotFileInput.click()"
+              (keydown.enter)="sharesOutstandingScreenshotFileInput.click()"
+              (keydown.space)="sharesOutstandingScreenshotFileInput.click()"
+            >
+              @if (
+                assetProfileForm.controls.sharesOutstandingScreenshot.value
+              ) {
+                <img
+                  class="d-block w-100"
+                  [src]="
+                    'data:' +
+                    assetProfileForm.controls
+                      .sharesOutstandingScreenshotContentType.value +
+                    ';base64,' +
+                    assetProfileForm.controls.sharesOutstandingScreenshot.value
+                  "
+                />
+              } @else {
+                <div class="p-3 text-center text-muted" i18n>
+                  Click to select an image, or paste (Ctrl+V) anywhere in this
+                  section
+                </div>
+              }
+            </div>
+            <input
+              #sharesOutstandingScreenshotFileInput
+              accept="image/png,image/jpeg,image/webp"
+              class="d-none"
+              type="file"
+              (change)="onSharesOutstandingScreenshotSelected($event)"
+            />
+          </div>
         </div>
       </mat-tab>
       <mat-tab>

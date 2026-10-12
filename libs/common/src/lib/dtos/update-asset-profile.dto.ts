@@ -16,8 +16,10 @@ import {
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsBase64,
   IsBoolean,
   IsEnum,
+  IsIn,
   IsObject,
   IsOptional,
   IsString,
@@ -122,6 +124,19 @@ export class UpdateAssetProfileDto {
   @Type(() => SectorDto)
   @ValidateNested({ each: true })
   sectors?: Prisma.InputJsonArray;
+
+  /**
+   * A screenshot of the shares outstanding chart/table, base64-encoded.
+   * Capped at roughly 3 MB decoded.
+   */
+  @IsBase64()
+  @IsOptional()
+  @MaxLength(4_000_000)
+  sharesOutstandingScreenshot?: string | null;
+
+  @IsIn(['image/png', 'image/jpeg', 'image/webp'])
+  @IsOptional()
+  sharesOutstandingScreenshotContentType?: string | null;
 
   @IsOptional()
   @IsString()

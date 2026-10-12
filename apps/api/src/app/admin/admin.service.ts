@@ -14,6 +14,7 @@ import {
   PROPERTY_IS_READ_ONLY_MODE,
   PROPERTY_IS_USER_SIGNUP_ENABLED
 } from '@ghostfolio/common/config';
+import { UpdateAssetProfileDto } from '@ghostfolio/common/dtos';
 import {
   applyAssetProfileOverrides,
   canMergeAssetProfile,
@@ -489,11 +490,13 @@ export class AdminService {
       risks,
       scraperConfiguration,
       sectors,
+      sharesOutstandingScreenshot,
+      sharesOutstandingScreenshotContentType,
       symbol: newSymbol,
       symbolMapping,
       tailwinds,
       url
-    }: Prisma.SymbolProfileUpdateInput
+    }: UpdateAssetProfileDto
   ) {
     const isConversionToManualDataSource =
       newDataSource === DataSource.MANUAL && dataSource !== DataSource.MANUAL;
@@ -623,6 +626,15 @@ export class AdminService {
         symbol,
         symbolMapping,
         tailwinds,
+        ...(sharesOutstandingScreenshot !== undefined && {
+          sharesOutstandingScreenshot:
+            sharesOutstandingScreenshot === null
+              ? null
+              : Buffer.from(sharesOutstandingScreenshot, 'base64')
+        }),
+        ...(sharesOutstandingScreenshotContentType !== undefined && {
+          sharesOutstandingScreenshotContentType
+        }),
         ...this.symbolProfileService.getAssetProfileUpdateInput(
           { dataSource, symbol },
           assetProfileOverrides
