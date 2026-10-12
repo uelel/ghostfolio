@@ -7,8 +7,13 @@ import type { AdminJobs } from './admin-jobs.interface';
 import type { AdminMarketDataDetails } from './admin-market-data-details.interface';
 import type { AdminUser } from './admin-user.interface';
 import type { AssetClassSelectorOption } from './asset-class-selector-option.interface';
+import type {
+  AssetProfileFinancials,
+  FinancialsRow
+} from './asset-profile-financials.interface';
 import type { AssetProfileIdentifier } from './asset-profile-identifier.interface';
 import type { AssetProfileItem } from './asset-profile-item.interface';
+import type { AssetProfileValuation } from './asset-profile-valuation.interface';
 import type { BenchmarkProperty } from './benchmark-property.interface';
 import type { Benchmark } from './benchmark.interface';
 import type { Coupon } from './coupon.interface';
@@ -19,6 +24,7 @@ import type { Filter } from './filter.interface';
 import type { FireCalculationCompleteEvent } from './fire-calculation-complete-event.interface';
 import type { FireWealth } from './fire-wealth.interface';
 import type { HistoricalDataItem } from './historical-data-item.interface';
+import type { HistoricalMetricPoint } from './historical-metric-point.interface';
 import type { HoldingWithParents } from './holding-with-parents.interface';
 import type { Holding } from './holding.interface';
 import type { InfoItem } from './info-item.interface';
@@ -121,10 +127,12 @@ export {
   ApiKeyResponse,
   AssertionCredentialJSON,
   AssetClassSelectorOption,
+  AssetProfileFinancials,
   AssetProfileIdentifier,
   AssetProfileItem,
   AssetProfileResponse,
   AssetProfilesResponse,
+  AssetProfileValuation,
   AssetResponse,
   AttestationCredentialJSON,
   Benchmark,
@@ -145,9 +153,11 @@ export {
   ExportResponse,
   Filter,
   FilterGroup,
+  FinancialsRow,
   FireCalculationCompleteEvent,
   FireWealth,
   HistoricalDataItem,
+  HistoricalMetricPoint,
   HistoricalResponse,
   Holding,
   HoldingWithParents,

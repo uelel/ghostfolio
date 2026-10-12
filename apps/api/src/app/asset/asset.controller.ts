@@ -20,15 +20,17 @@ export class AssetController {
     @Param('dataSource') dataSource: DataSource,
     @Param('symbol') symbol: string
   ): Promise<AssetResponse> {
-    const { assetProfile, marketData, splits } =
+    const { assetProfile, financials, marketData, splits, valuations } =
       await this.assetProfilesService.getAssetProfile({
         dataSource,
         symbol
       });
 
     return {
+      financials,
       marketData,
       splits,
+      valuations,
       assetProfile: pick(assetProfile, [
         'businessDescription',
         'competitiveAdvantages',

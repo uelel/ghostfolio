@@ -4,10 +4,13 @@ import {
   HEADER_KEY_TOKEN
 } from '@ghostfolio/common/config';
 import {
+  CreateAssetProfileFinancialsDto,
   CreateAssetProfileSplitDto,
+  CreateAssetProfileValuationDto,
   CreatePlatformDto,
   MergeAssetProfileDto,
   UpdateAssetProfileDto,
+  UpdateAssetProfileFinancialsDto,
   UpdatePlatformDto
 } from '@ghostfolio/common/dtos';
 import {
@@ -15,7 +18,9 @@ import {
   AdminJobs,
   AdminUserResponse,
   AdminUsersResponse,
+  AssetProfileFinancials,
   AssetProfileIdentifier,
+  AssetProfileValuation,
   DataProviderGhostfolioStatusResponse,
   DataProviderHistoricalResponse,
   EnhancedAssetProfile
@@ -72,6 +77,26 @@ export class AdminService {
   }: AssetProfileIdentifier & { id: string }) {
     return this.http.delete<void>(
       `/api/v1/asset-profiles/${dataSource}/${encodeURIComponent(symbol)}/splits/${id}`
+    );
+  }
+
+  public deleteAssetProfileFinancials({
+    dataSource,
+    id,
+    symbol
+  }: AssetProfileIdentifier & { id: string }) {
+    return this.http.delete<void>(
+      `/api/v1/asset-profiles/${dataSource}/${encodeURIComponent(symbol)}/financials/${id}`
+    );
+  }
+
+  public deleteAssetProfileValuation({
+    dataSource,
+    id,
+    symbol
+  }: AssetProfileIdentifier & { id: string }) {
+    return this.http.delete<void>(
+      `/api/v1/asset-profiles/${dataSource}/${encodeURIComponent(symbol)}/valuations/${id}`
     );
   }
 
@@ -213,6 +238,9 @@ export class AdminService {
       currency,
       dataGatheringFrequency,
       dataSource: newDataSource,
+      historicalDps,
+      historicalEps,
+      historicalPayoutRatio,
       isActive,
       name,
       risks,
@@ -236,6 +264,9 @@ export class AdminService {
         currency,
         dataGatheringFrequency,
         dataSource: newDataSource,
+        historicalDps,
+        historicalEps,
+        historicalPayoutRatio,
         isActive,
         name,
         risks,
@@ -257,6 +288,47 @@ export class AdminService {
     return this.http.post<AssetProfileSplit>(
       `/api/v1/asset-profiles/${dataSource}/${encodeURIComponent(symbol)}/splits`,
       split
+    );
+  }
+
+  public patchAssetProfileFinancials({
+    dataSource,
+    financials,
+    id,
+    symbol
+  }: AssetProfileIdentifier & {
+    financials: UpdateAssetProfileFinancialsDto;
+    id: string;
+  }) {
+    return this.http.patch<AssetProfileFinancials>(
+      `/api/v1/asset-profiles/${dataSource}/${encodeURIComponent(symbol)}/financials/${id}`,
+      financials
+    );
+  }
+
+  public postAssetProfileFinancials({
+    dataSource,
+    financials,
+    symbol
+  }: AssetProfileIdentifier & {
+    financials: CreateAssetProfileFinancialsDto;
+  }) {
+    return this.http.post<AssetProfileFinancials>(
+      `/api/v1/asset-profiles/${dataSource}/${encodeURIComponent(symbol)}/financials`,
+      financials
+    );
+  }
+
+  public postAssetProfileValuation({
+    dataSource,
+    symbol,
+    valuation
+  }: AssetProfileIdentifier & {
+    valuation: CreateAssetProfileValuationDto;
+  }) {
+    return this.http.post<AssetProfileValuation>(
+      `/api/v1/asset-profiles/${dataSource}/${encodeURIComponent(symbol)}/valuations`,
+      valuation
     );
   }
 

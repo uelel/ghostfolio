@@ -7,6 +7,7 @@ import {
 
 import { Country } from './country.interface';
 import { DataProviderInfo } from './data-provider-info.interface';
+import { HistoricalMetricPoint } from './historical-metric-point.interface';
 import { Holding } from './holding.interface';
 import { ScraperConfiguration } from './scraper-configuration.interface';
 import { Sector } from './sector.interface';
@@ -29,6 +30,9 @@ export interface EnhancedAssetProfile {
   figi?: string;
   figiComposite?: string;
   figiShareClass?: string;
+  historicalDps?: HistoricalMetricPoint[];
+  historicalEps?: HistoricalMetricPoint[];
+  historicalPayoutRatio?: HistoricalMetricPoint[];
   holdings: Holding[];
   id: string;
   isActive: boolean;

@@ -1,6 +1,8 @@
 import { ActivitiesService } from '@ghostfolio/api/app/activities/activities.service';
 import { PortfolioChangedEvent } from '@ghostfolio/api/events/portfolio-changed.event';
+import { AssetProfileFinancialsService } from '@ghostfolio/api/services/asset-profile-financials/asset-profile-financials.service';
 import { AssetProfileSplitService } from '@ghostfolio/api/services/asset-profile-split/asset-profile-split.service';
+import { AssetProfileValuationService } from '@ghostfolio/api/services/asset-profile-valuation/asset-profile-valuation.service';
 import { BenchmarkService } from '@ghostfolio/api/services/benchmark/benchmark.service';
 import { DataProviderService } from '@ghostfolio/api/services/data-provider/data-provider.service';
 import { ExchangeRateDataService } from '@ghostfolio/api/services/exchange-rate-data/exchange-rate-data.service';
@@ -8,7 +10,10 @@ import { MarketDataService } from '@ghostfolio/api/services/market-data/market-d
 import { PrismaService } from '@ghostfolio/api/services/prisma/prisma.service';
 import { DataGatheringService } from '@ghostfolio/api/services/queues/data-gathering/data-gathering.service';
 import { SymbolProfileService } from '@ghostfolio/api/services/symbol-profile/symbol-profile.service';
-import { UpdateAssetProfileDataDto } from '@ghostfolio/common/dtos';
+import {
+  UpdateAssetProfileDataDto,
+  UpdateAssetProfileFinancialsDto
+} from '@ghostfolio/common/dtos';
 import {
   applyAssetProfileOverrides,
   getAssetProfileIdentifier,
@@ -17,18 +22,29 @@ import {
 } from '@ghostfolio/common/helper';
 import {
   AdminMarketDataDetails,
+  AssetProfileFinancials,
   AssetProfileIdentifier,
   AssetProfileItem,
   AssetProfilesResponse,
+  AssetProfileValuation,
   DataProviderInfo,
   EnhancedAssetProfile,
+  FinancialsRow,
   Filter
 } from '@ghostfolio/common/interfaces';
 import { MarketDataPreset } from '@ghostfolio/common/types';
 
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { AssetClass, AssetSubClass, DataSource, Prisma } from '@prisma/client';
+import {
+  AssetClass,
+  AssetProfileFinancials as PrismaAssetProfileFinancials,
+  AssetProfileValuation as PrismaAssetProfileValuation,
+  AssetSubClass,
+  DataSource,
+  Prisma,
+  ValuationCategory
+} from '@prisma/client';
 import { groupBy } from 'lodash-es';
 
 @Injectable()
@@ -37,7 +53,9 @@ export class AssetProfilesService {
 
   public constructor(
     private readonly activitiesService: ActivitiesService,
+    private readonly assetProfileFinancialsService: AssetProfileFinancialsService,
     private readonly assetProfileSplitService: AssetProfileSplitService,
+    private readonly assetProfileValuationService: AssetProfileValuationService,
     private readonly benchmarkService: BenchmarkService,
     private readonly dataGatheringService: DataGatheringService,
     private readonly dataProviderService: DataProviderService,
@@ -100,6 +118,124 @@ export class AssetProfilesService {
       symbol,
       symbolProfileId
     });
+  }
+
+  public async createValuation({
+    category,
+    date,
+    dividendYieldPercent,
+    peRatio,
+    screenshot,
+    screenshotContentType,
+    symbolProfileId
+  }: {
+    category: ValuationCategory;
+    date: Date;
+    dividendYieldPercent?: number;
+    peRatio?: number;
+    screenshot?: Buffer;
+    screenshotContentType?: string;
+    symbolProfileId: string;
+  }): Promise<AssetProfileValuation> {
+    const assetProfileValuation =
+      await this.assetProfileValuationService.create({
+        category,
+        date,
+        dividendYieldPercent,
+        peRatio,
+        screenshot,
+        screenshotContentType,
+        symbolProfileId
+      });
+
+    return this.serializeValuation(assetProfileValuation);
+  }
+
+  public async deleteValuation({
+    id,
+    symbolProfileId
+  }: {
+    id: string;
+    symbolProfileId: string;
+  }) {
+    const isDeleted = await this.assetProfileValuationService.deleteById({
+      id,
+      symbolProfileId
+    });
+
+    if (!isDeleted) {
+      throw new NotFoundException();
+    }
+  }
+
+  public async createFinancials({
+    date,
+    symbolProfileId
+  }: {
+    date: Date;
+    symbolProfileId: string;
+  }): Promise<AssetProfileFinancials> {
+    const assetProfileFinancials =
+      await this.assetProfileFinancialsService.create({
+        date,
+        symbolProfileId
+      });
+
+    return this.serializeFinancials(assetProfileFinancials);
+  }
+
+  public async updateFinancials({
+    data,
+    id,
+    symbolProfileId
+  }: {
+    data: UpdateAssetProfileFinancialsDto;
+    id: string;
+    symbolProfileId: string;
+  }): Promise<AssetProfileFinancials> {
+    const { date, earningsGeographyRows, revenueShareRows, ...rest } = data;
+
+    const updateData: Prisma.AssetProfileFinancialsUpdateInput = { ...rest };
+
+    if (date !== undefined) {
+      updateData.date = new Date(date);
+    }
+
+    if (earningsGeographyRows !== undefined) {
+      updateData.earningsGeographyRows =
+        earningsGeographyRows as unknown as Prisma.InputJsonValue;
+    }
+
+    if (revenueShareRows !== undefined) {
+      updateData.revenueShareRows =
+        revenueShareRows as unknown as Prisma.InputJsonValue;
+    }
+
+    const assetProfileFinancials =
+      await this.assetProfileFinancialsService.update({
+        data: updateData,
+        id,
+        symbolProfileId
+      });
+
+    return this.serializeFinancials(assetProfileFinancials);
+  }
+
+  public async deleteFinancials({
+    id,
+    symbolProfileId
+  }: {
+    id: string;
+    symbolProfileId: string;
+  }) {
+    const isDeleted = await this.assetProfileFinancialsService.deleteById({
+      id,
+      symbolProfileId
+    });
+
+    if (!isDeleted) {
+      throw new NotFoundException();
+    }
   }
 
   /**
@@ -166,24 +302,33 @@ export class AssetProfilesService {
         await this.activitiesService.getStatisticsByCurrency(currency));
     }
 
-    const [[assetProfile], marketData, splits] = await Promise.all([
-      this.symbolProfileService.getSymbolProfiles([
-        {
+    const [[assetProfile], marketData, splits, valuations, financials] =
+      await Promise.all([
+        this.symbolProfileService.getSymbolProfiles([
+          {
+            dataSource,
+            symbol
+          }
+        ]),
+        this.marketDataService.marketDataItems({
+          orderBy: {
+            date: 'asc'
+          },
+          where: {
+            dataSource,
+            symbol
+          }
+        }),
+        this.assetProfileSplitService.getSplits({ dataSource, symbol }),
+        this.assetProfileValuationService.getValuations({
           dataSource,
           symbol
-        }
-      ]),
-      this.marketDataService.marketDataItems({
-        orderBy: {
-          date: 'asc'
-        },
-        where: {
+        }),
+        this.assetProfileFinancialsService.getFinancials({
           dataSource,
           symbol
-        }
-      }),
-      this.assetProfileSplitService.getSplits({ dataSource, symbol })
-    ]);
+        })
+      ]);
 
     if (assetProfile) {
       assetProfile.dataProviderInfo = this.dataProviderService
@@ -192,8 +337,14 @@ export class AssetProfilesService {
     }
 
     return {
+      financials: financials.map((item) => {
+        return this.serializeFinancials(item);
+      }),
       marketData,
       splits,
+      valuations: valuations.map((valuation) => {
+        return this.serializeValuation(valuation);
+      }),
       assetProfile: assetProfile ?? {
         activitiesCount,
         currency,
@@ -679,5 +830,61 @@ export class AssetProfilesService {
     });
 
     return this.prismaService.$extends(symbolProfileExtension);
+  }
+
+  /**
+   * Converts the screenshot of a valuation from bytes to a base64 string, so
+   * that it can be sent to the client as JSON
+   */
+  private serializeValuation(
+    valuation: PrismaAssetProfileValuation
+  ): AssetProfileValuation {
+    return {
+      ...valuation,
+      screenshot: valuation.screenshot
+        ? Buffer.from(valuation.screenshot).toString('base64')
+        : null
+    };
+  }
+
+  /**
+   * Narrows the JSONB row columns of a financials snapshot into typed arrays
+   * so the response matches the AssetProfileFinancials interface
+   */
+  private serializeFinancials(
+    financials: PrismaAssetProfileFinancials
+  ): AssetProfileFinancials {
+    return {
+      ...financials,
+      earningsGeographyRows: this.narrowFinancialsRows(
+        financials.earningsGeographyRows
+      ),
+      revenueShareRows: this.narrowFinancialsRows(financials.revenueShareRows)
+    };
+  }
+
+  private narrowFinancialsRows(value: Prisma.JsonValue): FinancialsRow[] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value.flatMap((entry) => {
+      if (
+        entry &&
+        typeof entry === 'object' &&
+        !Array.isArray(entry) &&
+        typeof (entry as { name?: unknown }).name === 'string' &&
+        typeof (entry as { percent?: unknown }).percent === 'number'
+      ) {
+        return [
+          {
+            name: (entry as { name: string }).name,
+            percent: (entry as { percent: number }).percent
+          }
+        ];
+      }
+
+      return [];
+    });
   }
 }

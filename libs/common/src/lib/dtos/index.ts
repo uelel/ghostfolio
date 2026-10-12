@@ -4,7 +4,9 @@ import { CreateAccessDto } from './create-access.dto';
 import { CreateAccountBalanceDto } from './create-account-balance.dto';
 import { CreateAccountWithBalancesDto } from './create-account-with-balances.dto';
 import { CreateAccountDto } from './create-account.dto';
+import { CreateAssetProfileFinancialsDto } from './create-asset-profile-financials.dto';
 import { CreateAssetProfileSplitDto } from './create-asset-profile-split.dto';
+import { CreateAssetProfileValuationDto } from './create-asset-profile-valuation.dto';
 import { CreateAssetProfileWithMarketDataDto } from './create-asset-profile-with-market-data.dto';
 import { CreateAssetProfileDto } from './create-asset-profile.dto';
 import { CreateOrderDto } from './create-order.dto';
@@ -13,6 +15,7 @@ import { CreateTagDto } from './create-tag.dto';
 import { CreateUserDto } from './create-user.dto';
 import { CreateWatchlistItemDto } from './create-watchlist-item.dto';
 import { DeleteOwnUserDto } from './delete-own-user.dto';
+import { HistoricalMetricPointDto } from './historical-metric-point.dto';
 import { HoldingDto } from './holding.dto';
 import { MergeAssetProfileDto } from './merge-asset-profile.dto';
 import { ScraperConfigurationDto } from './scraper-configuration.dto';
@@ -21,6 +24,7 @@ import { TransferBalanceDto } from './transfer-balance.dto';
 import { UpdateAccessDto } from './update-access.dto';
 import { UpdateAccountDto } from './update-account.dto';
 import { UpdateAssetProfileDataDto } from './update-asset-profile-data.dto';
+import { UpdateAssetProfileFinancialsDto } from './update-asset-profile-financials.dto';
 import { UpdateAssetProfileDto } from './update-asset-profile.dto';
 import { UpdateBulkMarketDataDto } from './update-bulk-market-data.dto';
 import { UpdateMarketDataDto } from './update-market-data.dto';
@@ -39,7 +43,9 @@ export {
   CreateAccountDto,
   CreateAccountWithBalancesDto,
   CreateAssetProfileDto,
+  CreateAssetProfileFinancialsDto,
   CreateAssetProfileSplitDto,
+  CreateAssetProfileValuationDto,
   CreateAssetProfileWithMarketDataDto,
   CreateOrderDto,
   CreatePlatformDto,
@@ -47,6 +53,7 @@ export {
   CreateUserDto,
   CreateWatchlistItemDto,
   DeleteOwnUserDto,
+  HistoricalMetricPointDto,
   HoldingDto,
   MergeAssetProfileDto,
   ScraperConfigurationDto,
@@ -56,6 +63,7 @@ export {
   UpdateAccountDto,
   UpdateAssetProfileDataDto,
   UpdateAssetProfileDto,
+  UpdateAssetProfileFinancialsDto,
   UpdateBulkMarketDataDto,
   UpdateMarketDataDto,
   UpdateOrderDto,

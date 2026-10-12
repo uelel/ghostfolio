@@ -7,7 +7,10 @@ import {
   COMMENT_MAXIMUM_LENGTH,
   PROPERTY_IS_DATA_GATHERING_ENABLED
 } from '@ghostfolio/common/config';
-import { UpdateAssetProfileDto } from '@ghostfolio/common/dtos';
+import {
+  CreateAssetProfileValuationDto,
+  UpdateAssetProfileDto
+} from '@ghostfolio/common/dtos';
 import { ConfirmationDialogType } from '@ghostfolio/common/enums';
 import {
   canDeleteAssetProfile,
@@ -24,7 +27,10 @@ import {
 import {
   AdminMarketDataDetails,
   AssetClassSelectorOption,
+  AssetProfileFinancials,
   AssetProfileIdentifier,
+  AssetProfileValuation,
+  HistoricalMetricPoint,
   LineChartItem,
   ScraperConfiguration,
   User
@@ -41,7 +47,8 @@ import {
   AssetClass,
   AssetSubClass,
   DataGatheringFrequency,
-  DataSource
+  DataSource,
+  ValuationCategory
 } from '@ghostfolio/prisma/enums';
 import { GfCurrencySelectorComponent } from '@ghostfolio/ui/currency-selector';
 import { GfEntityLogoComponent } from '@ghostfolio/ui/entity-logo';
@@ -82,12 +89,14 @@ import {
   MatCheckboxChange,
   MatCheckboxModule
 } from '@angular/material/checkbox';
+import { DateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
   MatDialogRef
 } from '@angular/material/dialog';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
@@ -105,15 +114,20 @@ import {
   createOutline,
   ellipsisVertical,
   gitCompareOutline,
+  podiumOutline,
   readerOutline,
   serverOutline,
-  trashOutline
+  statsChartOutline,
+  trashOutline,
+  trendingUpOutline
 } from 'ionicons/icons';
 import { isBoolean } from 'lodash-es';
 import ms from 'ms';
 import { EMPTY } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
+import { GfFinancialsTableComponent } from './financials-table/financials-table.component';
+import { GfHistoricalMetricEditorComponent } from './historical-metric-editor/historical-metric-editor.component';
 import { AssetProfileDialogParams } from './interfaces/interfaces';
 
 @Component({
@@ -124,7 +138,9 @@ import { AssetProfileDialogParams } from './interfaces/interfaces';
     FormsModule,
     GfCurrencySelectorComponent,
     GfEntityLogoComponent,
+    GfFinancialsTableComponent,
     GfHistoricalMarketDataEditorComponent,
+    GfHistoricalMetricEditorComponent,
     GfLineChartComponent,
     GfPortfolioProportionChartComponent,
     GfSymbolAutocompleteComponent,
@@ -134,6 +150,7 @@ import { AssetProfileDialogParams } from './interfaces/interfaces';
     MatCheckboxModule,
     MatDatepickerModule,
     MatDialogModule,
+    MatExpansionModule,
     MatInputModule,
     MatMenuModule,
     MatSelectModule,
@@ -183,6 +200,9 @@ export class GfAssetProfileDialogComponent implements OnInit {
     historicalData: this.formBuilder.group({
       csvString: ''
     }),
+    historicalDps: new FormControl<HistoricalMetricPoint[]>([]),
+    historicalEps: new FormControl<HistoricalMetricPoint[]>([]),
+    historicalPayoutRatio: new FormControl<HistoricalMetricPoint[]>([]),
     isActive: [true],
     name: ['', Validators.required],
     risks: '',
@@ -236,6 +256,16 @@ export class GfAssetProfileDialogComponent implements OnInit {
       }
     }
   );
+
+  protected readonly assetProfileValuationForm = this.formBuilder.group({
+    category: new FormControl<ValuationCategory | null>(
+      null,
+      Validators.required
+    ),
+    date: new FormControl<Date | null>(null, Validators.required),
+    dividendYieldPercent: new FormControl<number | null>(null),
+    peRatio: new FormControl<number | null>(null)
+  });
 
   protected readonly BULLET_LIST_MAXIMUM_LENGTH = BULLET_LIST_MAXIMUM_LENGTH;
   protected readonly BUSINESS_DESCRIPTION_MAXIMUM_LENGTH =
@@ -317,11 +347,29 @@ export class GfAssetProfileDialogComponent implements OnInit {
     [name: string]: { name: string; value: number };
   };
 
+  protected financials: AssetProfileFinancials[] = [];
+
   protected splits: AssetProfileSplit[] = [];
 
   protected readonly translate = translate;
 
   protected user: User;
+
+  protected readonly valuationCategoryOptions: {
+    id: ValuationCategory;
+    label: string;
+  }[] = [
+    ValuationCategory.UNDERVALUED,
+    ValuationCategory.FAIRLY_VALUED,
+    ValuationCategory.OVERVALUED
+  ].map((id) => {
+    return { id, label: translate(id) };
+  });
+
+  protected valuationScreenshot: { contentType: string; data: string } | null =
+    null;
+
+  protected valuations: AssetProfileValuation[] = [];
 
   private benchmarks: Partial<SymbolProfile>[];
 
@@ -331,6 +379,7 @@ export class GfAssetProfileDialogComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     @Inject(MAT_DIALOG_DATA) protected data: AssetProfileDialogParams,
     private dataService: DataService,
+    private dateAdapter: DateAdapter<Date, string>,
     private destroyRef: DestroyRef,
     private dialogRef: MatDialogRef<
       GfAssetProfileDialogComponent,
@@ -348,9 +397,12 @@ export class GfAssetProfileDialogComponent implements OnInit {
       createOutline,
       ellipsisVertical,
       gitCompareOutline,
+      podiumOutline,
       readerOutline,
       serverOutline,
-      trashOutline
+      statsChartOutline,
+      trashOutline,
+      trendingUpOutline
     });
   }
 
@@ -364,6 +416,8 @@ export class GfAssetProfileDialogComponent implements OnInit {
     this.benchmarks = benchmarks;
     this.currencies = currencies;
     this.defaultDateFormat = getDateFormatString(this.data.locale);
+
+    this.dateAdapter.setLocale(this.data.locale);
 
     this.initialize();
   }
@@ -418,109 +472,122 @@ export class GfAssetProfileDialogComponent implements OnInit {
         symbol: this.data.symbol
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(({ assetProfile, marketData, splits }) => {
-        this.assetProfile = assetProfile;
-        this.splits = splits ?? [];
+      .subscribe(
+        ({ assetProfile, financials, marketData, splits, valuations }) => {
+          this.assetProfile = assetProfile;
+          this.financials = financials ?? [];
+          this.splits = splits ?? [];
+          this.valuations = valuations ?? [];
 
-        this.assetClassLabel = translate(this.assetProfile?.assetClass ?? '');
-        this.assetSubClassLabel = translate(
-          this.assetProfile?.assetSubClass ?? ''
-        );
+          this.assetClassLabel = translate(this.assetProfile?.assetClass ?? '');
+          this.assetSubClassLabel = translate(
+            this.assetProfile?.assetSubClass ?? ''
+          );
 
-        this.canEditAssetProfile = !isCurrency(
-          getCurrencyFromSymbol(this.data.symbol)
-        );
+          this.canEditAssetProfile = !isCurrency(
+            getCurrencyFromSymbol(this.data.symbol)
+          );
 
-        this.countries = {};
+          this.countries = {};
 
-        this.isBenchmark = this.benchmarks.some(({ id }) => {
-          return id === this.assetProfile.id;
-        });
+          this.isBenchmark = this.benchmarks.some(({ id }) => {
+            return id === this.assetProfile.id;
+          });
 
-        this.historicalDataItems = marketData.map(({ date, marketPrice }) => {
-          return {
-            date: format(date, DATE_FORMAT),
-            value: marketPrice
-          };
-        });
-
-        this.marketDataItems = marketData;
-        this.sectors = {};
-
-        if (
-          this.assetProfile?.countries &&
-          this.assetProfile.countries.length > 0
-        ) {
-          for (const { code, weight } of this.assetProfile.countries) {
-            this.countries[code] = {
-              name: getCountryName({ code }),
-              value: weight
+          this.historicalDataItems = marketData.map(({ date, marketPrice }) => {
+            return {
+              date: format(date, DATE_FORMAT),
+              value: marketPrice
             };
-          }
-        }
+          });
 
-        if (
-          this.assetProfile?.sectors &&
-          this.assetProfile.sectors.length > 0
-        ) {
-          for (const { name, weight } of this.assetProfile.sectors) {
-            this.sectors[name] = {
-              name: translate(name),
-              value: weight
-            };
-          }
-        }
+          this.marketDataItems = marketData;
+          this.sectors = {};
 
-        this.assetProfileForm.setValue({
-          assetClass: this.assetProfile.assetClass ?? null,
-          assetSubClass: this.assetProfile.assetSubClass ?? null,
-          businessDescription: this.assetProfile?.businessDescription ?? '',
-          comment: this.assetProfile?.comment ?? '',
-          competitiveAdvantages: this.assetProfile?.competitiveAdvantages ?? '',
-          countries: JSON.stringify(
-            this.assetProfile?.countries?.map(({ code, weight }) => {
-              return { code, weight };
-            }) ?? []
-          ),
-          currency: this.assetProfile?.currency ?? null,
-          dataGatheringFrequency:
-            this.assetProfile?.dataGatheringFrequency ?? 'DAILY',
-          historicalData: {
-            csvString: GfAssetProfileDialogComponent.HISTORICAL_DATA_TEMPLATE
-          },
-          isActive: isBoolean(this.assetProfile?.isActive)
-            ? this.assetProfile.isActive
-            : null,
-          name: this.assetProfile.name ?? this.assetProfile.symbol ?? null,
-          risks: this.assetProfile?.risks ?? '',
-          scraperConfiguration: {
-            defaultMarketPrice:
-              this.assetProfile?.scraperConfiguration?.defaultMarketPrice ??
-              null,
-            headers: JSON.stringify(
-              this.assetProfile?.scraperConfiguration?.headers ?? {}
+          if (
+            this.assetProfile?.countries &&
+            this.assetProfile.countries.length > 0
+          ) {
+            for (const { code, weight } of this.assetProfile.countries) {
+              this.countries[code] = {
+                name: getCountryName({ code }),
+                value: weight
+              };
+            }
+          }
+
+          if (
+            this.assetProfile?.sectors &&
+            this.assetProfile.sectors.length > 0
+          ) {
+            for (const { name, weight } of this.assetProfile.sectors) {
+              this.sectors[name] = {
+                name: translate(name),
+                value: weight
+              };
+            }
+          }
+
+          this.assetProfileForm.setValue({
+            assetClass: this.assetProfile.assetClass ?? null,
+            assetSubClass: this.assetProfile.assetSubClass ?? null,
+            businessDescription: this.assetProfile?.businessDescription ?? '',
+            comment: this.assetProfile?.comment ?? '',
+            competitiveAdvantages:
+              this.assetProfile?.competitiveAdvantages ?? '',
+            countries: JSON.stringify(
+              this.assetProfile?.countries?.map(({ code, weight }) => {
+                return { code, weight };
+              }) ?? []
             ),
-            locale: this.assetProfile?.scraperConfiguration?.locale ?? '',
-            mode: this.assetProfile?.scraperConfiguration?.mode ?? 'lazy',
-            selector: this.assetProfile?.scraperConfiguration?.selector ?? '',
-            url: this.assetProfile?.scraperConfiguration?.url ?? ''
-          },
-          sectors: JSON.stringify(this.assetProfile?.sectors ?? []),
-          symbolMapping: JSON.stringify(this.assetProfile?.symbolMapping ?? {}),
-          tailwinds: this.assetProfile?.tailwinds ?? '',
-          url: this.assetProfile?.url ?? ''
-        });
+            currency: this.assetProfile?.currency ?? null,
+            dataGatheringFrequency:
+              this.assetProfile?.dataGatheringFrequency ?? 'DAILY',
+            historicalData: {
+              csvString: GfAssetProfileDialogComponent.HISTORICAL_DATA_TEMPLATE
+            },
+            historicalDps: (this.assetProfile?.historicalDps ??
+              []) as HistoricalMetricPoint[],
+            historicalEps: (this.assetProfile?.historicalEps ??
+              []) as HistoricalMetricPoint[],
+            historicalPayoutRatio: (this.assetProfile?.historicalPayoutRatio ??
+              []) as HistoricalMetricPoint[],
+            isActive: isBoolean(this.assetProfile?.isActive)
+              ? this.assetProfile.isActive
+              : null,
+            name: this.assetProfile.name ?? this.assetProfile.symbol ?? null,
+            risks: this.assetProfile?.risks ?? '',
+            scraperConfiguration: {
+              defaultMarketPrice:
+                this.assetProfile?.scraperConfiguration?.defaultMarketPrice ??
+                null,
+              headers: JSON.stringify(
+                this.assetProfile?.scraperConfiguration?.headers ?? {}
+              ),
+              locale: this.assetProfile?.scraperConfiguration?.locale ?? '',
+              mode: this.assetProfile?.scraperConfiguration?.mode ?? 'lazy',
+              selector: this.assetProfile?.scraperConfiguration?.selector ?? '',
+              url: this.assetProfile?.scraperConfiguration?.url ?? ''
+            },
+            sectors: JSON.stringify(this.assetProfile?.sectors ?? []),
+            symbolMapping: JSON.stringify(
+              this.assetProfile?.symbolMapping ?? {}
+            ),
+            tailwinds: this.assetProfile?.tailwinds ?? '',
+            url: this.assetProfile?.url ?? ''
+          });
 
-        if (!this.canEditAssetProfile) {
-          this.assetProfileForm.disable();
+          if (!this.canEditAssetProfile) {
+            this.assetProfileForm.disable();
+          }
+
+          this.assetProfileForm.markAsPristine();
+
+          this.isLoading = false;
+
+          this.changeDetectorRef.markForCheck();
         }
-
-        this.assetProfileForm.markAsPristine();
-
-        this.isLoading = false;
-
-        this.changeDetectorRef.markForCheck();
-      });
+      );
   }
 
   protected onCancelEditAssetProfileIdentifierMode() {
@@ -614,6 +681,105 @@ export class GfAssetProfileDialogComponent implements OnInit {
   protected onDeleteSplit(aId: string) {
     this.adminService
       .deleteAssetProfileSplit({
+        dataSource: this.data.dataSource,
+        id: aId,
+        symbol: this.data.symbol
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.initialize();
+      });
+  }
+
+  protected onValuationScreenshotSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+
+    if (!file) {
+      this.valuationScreenshot = null;
+
+      return;
+    }
+
+    this.readValuationScreenshotFile(file);
+  }
+
+  protected onValuationScreenshotPasted(event: ClipboardEvent) {
+    const target = event.target as HTMLElement;
+
+    if (target.closest('input, mat-select, textarea')) {
+      // Let the browser paste into the focused form control as usual
+      return;
+    }
+
+    const item = Array.from(event.clipboardData?.items ?? []).find(
+      ({ type }) => {
+        return type.startsWith('image/');
+      }
+    );
+
+    const file = item?.getAsFile();
+
+    if (!file) {
+      return;
+    }
+
+    event.preventDefault();
+
+    this.readValuationScreenshotFile(file);
+  }
+
+  protected onValuationFormClicked(
+    event: MouseEvent,
+    formElement: HTMLFormElement
+  ) {
+    const target = event.target as HTMLElement;
+
+    if (
+      target.closest(
+        'input, mat-select, button, textarea, .screenshot-drop-zone'
+      )
+    ) {
+      return;
+    }
+
+    formElement.focus();
+  }
+
+  protected onAddValuation() {
+    const { category, date, dividendYieldPercent, peRatio } =
+      this.assetProfileValuationForm.getRawValue();
+
+    if (!date || !category) {
+      return;
+    }
+
+    const valuation: CreateAssetProfileValuationDto = {
+      category,
+      date: format(date, DATE_FORMAT),
+      dividendYieldPercent: dividendYieldPercent ?? undefined,
+      peRatio: peRatio ?? undefined,
+      screenshot: this.valuationScreenshot?.data,
+      screenshotContentType: this.valuationScreenshot?.contentType
+    };
+
+    this.adminService
+      .postAssetProfileValuation({
+        valuation,
+        dataSource: this.data.dataSource,
+        symbol: this.data.symbol
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.assetProfileValuationForm.reset();
+        this.valuationScreenshot = null;
+
+        this.initialize();
+      });
+  }
+
+  protected onDeleteValuation(aId: string) {
+    this.adminService
+      .deleteAssetProfileValuation({
         dataSource: this.data.dataSource,
         id: aId,
         symbol: this.data.symbol
@@ -736,6 +902,12 @@ export class GfAssetProfileDialogComponent implements OnInit {
       dataGatheringFrequency:
         this.assetProfileForm.controls.dataGatheringFrequency.value ??
         undefined,
+      historicalDps: (this.assetProfileForm.controls.historicalDps.value ??
+        []) as unknown as Prisma.InputJsonArray,
+      historicalEps: (this.assetProfileForm.controls.historicalEps.value ??
+        []) as unknown as Prisma.InputJsonArray,
+      historicalPayoutRatio: (this.assetProfileForm.controls
+        .historicalPayoutRatio.value ?? []) as unknown as Prisma.InputJsonArray,
       isActive: isBoolean(this.assetProfileForm.controls.isActive.value)
         ? this.assetProfileForm.controls.isActive.value
         : undefined,
@@ -1037,5 +1209,19 @@ export class GfAssetProfileDialogComponent implements OnInit {
       },
       confirmType: ConfirmationDialogType.Primary
     });
+  }
+
+  private readValuationScreenshotFile(file: File) {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const [, data] = (reader.result as string).split(',');
+
+      this.valuationScreenshot = { data, contentType: file.type };
+
+      this.changeDetectorRef.markForCheck();
+    };
+
+    reader.readAsDataURL(file);
   }
 }
