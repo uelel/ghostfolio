@@ -2,6 +2,8 @@ import { AdminMarketDataService } from '@ghostfolio/client/components/admin-mark
 import { UserService } from '@ghostfolio/client/services/user/user.service';
 import {
   ASSET_CLASS_MAPPING,
+  BULLET_LIST_MAXIMUM_LENGTH,
+  BUSINESS_DESCRIPTION_MAXIMUM_LENGTH,
   COMMENT_MAXIMUM_LENGTH,
   PROPERTY_IS_DATA_GATHERING_ENABLED
 } from '@ghostfolio/common/config';
@@ -97,6 +99,7 @@ import { format } from 'date-fns';
 import { StatusCodes } from 'http-status-codes';
 import { addIcons } from 'ionicons';
 import {
+  bulbOutline,
   calendarClearOutline,
   codeSlashOutline,
   createOutline,
@@ -171,7 +174,9 @@ export class GfAssetProfileDialogComponent implements OnInit {
   protected readonly assetProfileForm = this.formBuilder.group({
     assetClass: new FormControl<AssetClass | null>(null),
     assetSubClass: new FormControl<AssetSubClass | null>(null),
+    businessDescription: '',
     comment: '',
+    competitiveAdvantages: '',
     countries: ['', jsonValidator()],
     currency: '',
     dataGatheringFrequency: new FormControl<DataGatheringFrequency>('DAILY'),
@@ -180,6 +185,7 @@ export class GfAssetProfileDialogComponent implements OnInit {
     }),
     isActive: [true],
     name: ['', Validators.required],
+    risks: '',
     scraperConfiguration: this.formBuilder.group<
       Omit<ScraperConfiguration, 'headers'> & {
         headers: FormControl<string | null>;
@@ -194,6 +200,7 @@ export class GfAssetProfileDialogComponent implements OnInit {
     }),
     sectors: ['', jsonValidator()],
     symbolMapping: ['', jsonValidator()],
+    tailwinds: '',
     url: ''
   });
 
@@ -230,6 +237,9 @@ export class GfAssetProfileDialogComponent implements OnInit {
     }
   );
 
+  protected readonly BULLET_LIST_MAXIMUM_LENGTH = BULLET_LIST_MAXIMUM_LENGTH;
+  protected readonly BUSINESS_DESCRIPTION_MAXIMUM_LENGTH =
+    BUSINESS_DESCRIPTION_MAXIMUM_LENGTH;
   protected readonly canDeleteAssetProfile = canDeleteAssetProfile;
   protected canEditAssetProfile = true;
   protected readonly COMMENT_MAXIMUM_LENGTH = COMMENT_MAXIMUM_LENGTH;
@@ -332,6 +342,7 @@ export class GfAssetProfileDialogComponent implements OnInit {
     private userService: UserService
   ) {
     addIcons({
+      bulbOutline,
       calendarClearOutline,
       codeSlashOutline,
       createOutline,
@@ -463,7 +474,9 @@ export class GfAssetProfileDialogComponent implements OnInit {
         this.assetProfileForm.setValue({
           assetClass: this.assetProfile.assetClass ?? null,
           assetSubClass: this.assetProfile.assetSubClass ?? null,
+          businessDescription: this.assetProfile?.businessDescription ?? '',
           comment: this.assetProfile?.comment ?? '',
+          competitiveAdvantages: this.assetProfile?.competitiveAdvantages ?? '',
           countries: JSON.stringify(
             this.assetProfile?.countries?.map(({ code, weight }) => {
               return { code, weight };
@@ -479,6 +492,7 @@ export class GfAssetProfileDialogComponent implements OnInit {
             ? this.assetProfile.isActive
             : null,
           name: this.assetProfile.name ?? this.assetProfile.symbol ?? null,
+          risks: this.assetProfile?.risks ?? '',
           scraperConfiguration: {
             defaultMarketPrice:
               this.assetProfile?.scraperConfiguration?.defaultMarketPrice ??
@@ -493,6 +507,7 @@ export class GfAssetProfileDialogComponent implements OnInit {
           },
           sectors: JSON.stringify(this.assetProfile?.sectors ?? []),
           symbolMapping: JSON.stringify(this.assetProfile?.symbolMapping ?? {}),
+          tailwinds: this.assetProfile?.tailwinds ?? '',
           url: this.assetProfile?.url ?? ''
         });
 
@@ -710,7 +725,13 @@ export class GfAssetProfileDialogComponent implements OnInit {
       assetClass: this.assetProfileForm.controls.assetClass.value ?? undefined,
       assetSubClass:
         this.assetProfileForm.controls.assetSubClass.value ?? undefined,
+      businessDescription: getStringOrNull(
+        this.assetProfileForm.controls.businessDescription.value
+      ),
       comment: getStringOrNull(this.assetProfileForm.controls.comment.value),
+      competitiveAdvantages: getStringOrNull(
+        this.assetProfileForm.controls.competitiveAdvantages.value
+      ),
       currency: this.assetProfileForm.controls.currency.value ?? undefined,
       dataGatheringFrequency:
         this.assetProfileForm.controls.dataGatheringFrequency.value ??
@@ -719,6 +740,10 @@ export class GfAssetProfileDialogComponent implements OnInit {
         ? this.assetProfileForm.controls.isActive.value
         : undefined,
       name: this.assetProfileForm.controls.name.value ?? undefined,
+      risks: getStringOrNull(this.assetProfileForm.controls.risks.value),
+      tailwinds: getStringOrNull(
+        this.assetProfileForm.controls.tailwinds.value
+      ),
       url: getStringOrNull(this.assetProfileForm.controls.url.value)
     };
 

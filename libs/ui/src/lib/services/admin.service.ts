@@ -206,17 +206,21 @@ export class AdminService {
     {
       assetClass,
       assetSubClass,
+      businessDescription,
       comment,
+      competitiveAdvantages,
       countries,
       currency,
       dataGatheringFrequency,
       dataSource: newDataSource,
       isActive,
       name,
+      risks,
       scraperConfiguration,
       sectors,
       symbol: newSymbol,
       symbolMapping,
+      tailwinds,
       url
     }: UpdateAssetProfileDto
   ) {
@@ -225,17 +229,21 @@ export class AdminService {
       {
         assetClass,
         assetSubClass,
+        businessDescription,
         comment,
+        competitiveAdvantages,
         countries,
         currency,
         dataGatheringFrequency,
         dataSource: newDataSource,
         isActive,
         name,
+        risks,
         scraperConfiguration,
         sectors,
         symbol: newSymbol,
         symbolMapping,
+        tailwinds,
         url
       }
     );

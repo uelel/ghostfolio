@@ -15,7 +15,9 @@ export interface EnhancedAssetProfile {
   activitiesCount: number;
   assetClass: AssetClass;
   assetSubClass: AssetSubClass;
+  businessDescription?: string;
   comment?: string;
+  competitiveAdvantages?: string;
   countries: Country[];
   createdAt: Date;
   currency?: string;
@@ -32,10 +34,12 @@ export interface EnhancedAssetProfile {
   isActive: boolean;
   isin?: string;
   name?: string;
+  risks?: string;
   scraperConfiguration?: ScraperConfiguration;
   sectors: Sector[];
   symbol: string;
   symbolMapping?: { [key: string]: string };
+  tailwinds?: string;
   updatedAt: Date;
   url?: string;
   userId?: string;

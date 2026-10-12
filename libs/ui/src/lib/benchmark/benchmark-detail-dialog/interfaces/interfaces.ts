@@ -5,6 +5,7 @@ export interface BenchmarkDetailDialogParams {
   colorScheme?: ColorScheme;
   dataSource: DataSource;
   deviceType: string;
+  hasPermissionToAccessAdminControl: boolean;
   locale: string;
   symbol: string;
 }

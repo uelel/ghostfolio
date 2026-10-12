@@ -1,4 +1,6 @@
 import {
+  BULLET_LIST_MAXIMUM_LENGTH,
+  BUSINESS_DESCRIPTION_MAXIMUM_LENGTH,
   COMMENT_MAXIMUM_LENGTH,
   SYMBOL_MAXIMUM_LENGTH
 } from '@ghostfolio/common/config';
@@ -37,8 +39,18 @@ export class CreateAssetProfileDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(BUSINESS_DESCRIPTION_MAXIMUM_LENGTH)
+  businessDescription?: string;
+
+  @IsOptional()
+  @IsString()
   @MaxLength(COMMENT_MAXIMUM_LENGTH)
   comment?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(BULLET_LIST_MAXIMUM_LENGTH)
+  competitiveAdvantages?: string;
 
   @IsArray()
   @IsOptional()
@@ -86,6 +98,11 @@ export class CreateAssetProfileDto {
   @IsString()
   name?: string;
 
+  @IsOptional()
+  @IsString()
+  @MaxLength(BULLET_LIST_MAXIMUM_LENGTH)
+  risks?: string;
+
   @IsArray()
   @IsOptional()
   @Type(() => SectorDto)
@@ -95,6 +112,11 @@ export class CreateAssetProfileDto {
   @IsString()
   @MaxLength(SYMBOL_MAXIMUM_LENGTH)
   symbol: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(BULLET_LIST_MAXIMUM_LENGTH)
+  tailwinds?: string;
 
   @IsOptional()
   @IsUrl({
