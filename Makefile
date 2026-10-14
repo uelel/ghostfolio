@@ -4,7 +4,7 @@ COMPOSE_DEV = docker compose -f docker/docker-compose.dev.yml
 .PHONY: start-prod build-prod stop-prod start-dev stop-dev migrate
 
 start-prod:
-	$(COMPOSE) up -d
+	$(COMPOSE) up
 
 build-prod:
 	$(COMPOSE) build
