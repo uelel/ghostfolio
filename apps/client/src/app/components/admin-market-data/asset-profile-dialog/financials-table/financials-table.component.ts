@@ -36,9 +36,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { IonIcon } from '@ionic/angular/standalone';
-import { format, isValid, subDays } from 'date-fns';
+import { format, isValid, parse, subDays } from 'date-fns';
 import { addIcons } from 'ionicons';
-import { addOutline, trashOutline } from 'ionicons/icons';
+import { addOutline, calendarOutline, trashOutline } from 'ionicons/icons';
 import { Subscription } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 
@@ -190,7 +190,7 @@ export class GfFinancialsTableComponent implements OnChanges, OnDestroy {
   private readonly patchSubscriptions = new Set<Subscription>();
 
   public constructor() {
-    addIcons({ addOutline, trashOutline });
+    addIcons({ addOutline, calendarOutline, trashOutline });
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -293,6 +293,21 @@ export class GfFinancialsTableComponent implements OnChanges, OnDestroy {
       .subscribe(() => {
         this.changed.emit();
       });
+  }
+
+  protected onDatePaste(column: Column, event: ClipboardEvent): void {
+    const text = event.clipboardData?.getData('text')?.trim();
+
+    if (!text) {
+      return;
+    }
+
+    const parsed = parse(text, 'd/M/yyyy', new Date());
+
+    if (isValid(parsed)) {
+      event.preventDefault();
+      column.form.controls.date.setValue(parsed);
+    }
   }
 
   protected onAddDynamicRow(section: DynamicSection): void {

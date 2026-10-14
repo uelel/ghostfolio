@@ -103,10 +103,25 @@
     overflow: hidden;
   }
 
-  .date-input {
-    cursor: pointer;
-    text-align: center;
-    width: 100%;
+  .date-field-wrapper {
+    align-items: center;
+    display: flex;
+
+    .date-input {
+      flex: 1;
+      min-width: 0;
+      text-align: center;
+    }
+
+    .date-picker-toggle {
+      --mdc-icon-button-state-layer-size: 1.1rem;
+      color: rgba(var(--palette-foreground-secondary-text));
+      flex-shrink: 0;
+      font-size: 0.9rem;
+      height: 1.1rem;
+      padding: 0;
+      width: 1.1rem;
+    }
   }
 
   .metric-label {
@@ -136,7 +151,7 @@
   }
 
   .section-row .section-header {
-    background: rgba(var(--palette-foreground-base), 0.04);
+    background: rgba(var(--palette-foreground-base), 0.04) !important;
     font-weight: 600;
     padding: 0.35rem 0.75rem;
   }

@@ -1,14 +1,35 @@
 <div class="financials-table-wrapper">
   <table class="gf-table" mat-table [dataSource]="rows" [trackBy]="trackRow">
-    <!-- Top title row: "Fiscal year" spanning the full width -->
+    <!-- Top title row: "Fiscal year" label spanning label + snapshot columns -->
     <ng-container matColumnDef="fiscalYearTitle">
       <th
         *matHeaderCellDef
         class="section-header"
         mat-header-cell
-        [attr.colspan]="displayedColumns.length"
+        [attr.colspan]="displayedColumns.length - 1"
       >
         <ng-container i18n>Fiscal year</ng-container>
+      </th>
+    </ng-container>
+
+    <!-- Top title row: "+" button aligned with the add column -->
+    <ng-container matColumnDef="fiscalYearAdd">
+      <th
+        *matHeaderCellDef
+        class="section-header add-column-header"
+        mat-header-cell
+      >
+        <button
+          aria-label="Add column"
+          color="primary"
+          i18n-aria-label
+          mat-icon-button
+          type="button"
+          [disabled]="!canEdit"
+          (click)="onAddColumn()"
+        >
+          <ion-icon name="add-outline" />
+        </button>
       </th>
     </ng-container>
 
@@ -71,13 +92,23 @@
     @for (column of columns; track column.id) {
       <ng-container [matColumnDef]="columnId(column)">
         <th *matHeaderCellDef class="snapshot-header" mat-header-cell>
-          <input
-            class="form-control form-control-sm date-input"
-            readonly
-            [formControl]="column.form.controls.date"
-            [matDatepicker]="headerDatePicker"
-            (click)="headerDatePicker.open()"
-          />
+          <div class="date-field-wrapper">
+            <input
+              class="form-control form-control-sm date-input"
+              [formControl]="column.form.controls.date"
+              [matDatepicker]="headerDatePicker"
+              (paste)="onDatePaste(column, $event)"
+            />
+            <button
+              class="date-picker-toggle"
+              mat-icon-button
+              type="button"
+              [disabled]="!canEdit"
+              (click)="headerDatePicker.open()"
+            >
+              <ion-icon name="calendar-outline" />
+            </button>
+          </div>
           <mat-datepicker #headerDatePicker></mat-datepicker>
         </th>
         <td *matCellDef="let row" class="snapshot-cell" mat-cell>
@@ -173,21 +204,9 @@
       </ng-container>
     }
 
-    <!-- Add-column (last column; "+" in the header) -->
+    <!-- Add-column (layout spacer; button moved to fiscalYearTitle header) -->
     <ng-container matColumnDef="add">
-      <th *matHeaderCellDef class="add-column-header" mat-header-cell>
-        <button
-          aria-label="Add column"
-          color="primary"
-          i18n-aria-label
-          mat-icon-button
-          type="button"
-          [disabled]="!canEdit"
-          (click)="onAddColumn()"
-        >
-          <ion-icon name="add-outline" />
-        </button>
-      </th>
+      <th *matHeaderCellDef class="add-column-header" mat-header-cell></th>
       <td *matCellDef="let _" mat-cell></td>
     </ng-container>
 
@@ -224,7 +243,7 @@
     </ng-container>
 
     <tr
-      *matHeaderRowDef="['fiscalYearTitle']; sticky: true"
+      *matHeaderRowDef="['fiscalYearTitle', 'fiscalYearAdd']; sticky: true"
       class="section-row"
       mat-header-row
     ></tr>
