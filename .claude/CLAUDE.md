@@ -20,3 +20,12 @@ This app allows maintenance of a dividend portfolio:
 ## Notes
 
 - [Universal findings for new features](https://claude.ai/code/artifact/875c00cc-8d8a-466d-be2b-ceda2832d057) — codebase gotchas learned while adding fork features
+
+## TODO
+
+- Research tab: autosave when clicking outside text fields
+- Financials tab: reverse unit order in the dropdown — M first, B second
+- Financials tab: add new units: 10M, 1T
+- Financials tab: revenue rows - move the delete icon
+- Financials tab: center monetary amounts with units horizontally
+- Financials tab: revenue rows - break long labels to a new line, display whole text
