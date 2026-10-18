@@ -55,11 +55,6 @@ export class WatchlistService {
       );
     }
 
-    await this.dataGatheringService.gatherSymbol({
-      dataSource,
-      symbol
-    });
-
     await this.prismaService.user.update({
       data: {
         watchlist: {
@@ -69,6 +64,11 @@ export class WatchlistService {
         }
       },
       where: { id: userId }
+    });
+
+    await this.dataGatheringService.gatherSymbol({
+      dataSource,
+      symbol
     });
   }
 
