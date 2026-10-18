@@ -29,3 +29,4 @@ This app allows maintenance of a dividend portfolio:
 - Financials tab: revenue rows - move the delete icon
 - Financials tab: center monetary amounts with units horizontally
 - Financials tab: revenue rows - break long labels to a new line, display whole text
+- Valuation tab: show valuations from oldest (top) to latest (bottom)
