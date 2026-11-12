@@ -7,6 +7,17 @@ DUMP_FILE = ghostfolio-backup-$(shell date +%Y%m%d).dump
 
 .PHONY: start-prod build-prod stop-prod start-dev stop-dev migrate export-db import-db
 
+# Allow `make import-db <file>` in addition to `make import-db FILE=<file>`:
+# take the second goal as FILE and turn it into a silent no-op target.
+ifeq (import-db,$(firstword $(MAKECMDGOALS)))
+  IMPORT_ARG := $(word 2,$(MAKECMDGOALS))
+  ifneq (,$(IMPORT_ARG))
+    FILE ?= $(IMPORT_ARG)
+    .PHONY: $(IMPORT_ARG)
+    $(IMPORT_ARG): ; @:
+  endif
+endif
+
 start-prod:
 	$(COMPOSE) up
 
@@ -37,7 +48,7 @@ export-db:
 	@echo "Exported to $(DUMP_FILE)"
 
 import-db:
-	@test -n "$(FILE)" || (echo "Usage: make import-db FILE=ghostfolio-backup-YYYYMMDD.dump" && exit 1)
+	@test -n "$(FILE)" || (echo "Usage: make import-db ghostfolio-backup-YYYYMMDD.dump (or FILE=...)" && exit 1)
 	docker cp $(FILE) $(DB_CONTAINER):/tmp/ghostfolio.dump
 	docker exec $(DB_CONTAINER) pg_restore -U $(DB_USER) -d $(DB_NAME) --clean --if-exists -F c /tmp/ghostfolio.dump
 	docker exec $(DB_CONTAINER) rm /tmp/ghostfolio.dump
