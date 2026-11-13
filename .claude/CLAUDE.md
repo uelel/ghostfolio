@@ -30,3 +30,4 @@ This app allows maintenance of a dividend portfolio:
 - Financials tab: center monetary amounts with units horizontally
 - Financials tab: revenue rows - break long labels to a new line, display whole text
 - Valuation tab: show valuations from oldest (top) to latest (bottom)
+- Fundamentals tab: when a table is expanded by clicking, the popup scrolls down and you have to scroll back up to edit values. Remove the scroll-down on table expand
