@@ -25,5 +25,19 @@ services:
     env_file:
       - ../.env.prod
 
+  caddy:
+    image: caddy:2
+    container_name: gf-caddy
+    restart: unless-stopped
+    command: caddy reverse-proxy --from ghostfolio.localhost --to ghostfolio:3333 --internal-certs
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - caddy-data:/data
+    depends_on:
+      - ghostfolio
+
 volumes:
   postgres:
+  caddy-data:

@@ -39,7 +39,7 @@ stop-dev:
 
 migrate:
 	$(COMPOSE_DEV) up -d --wait postgres
-	@unset NPM_CONFIG_PREFIX && . $$HOME/.nvm/nvm.sh && nvm use 22 && npm run database:push && npm run database:generate-typings
+	@npm run database:push && npm run database:generate-typings
 
 export-db:
 	docker exec $(DB_CONTAINER) pg_dump -U $(DB_USER) -d $(DB_NAME) -F c -f /tmp/ghostfolio.dump
