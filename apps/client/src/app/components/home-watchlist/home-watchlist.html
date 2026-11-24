@@ -14,6 +14,7 @@
         [deviceType]="deviceType()"
         [hasPermissionToDeleteItem]="hasPermissionToDeleteWatchlistItem"
         [locale]="user?.settings?.locale ?? DEFAULT_LOCALE"
+        [openAssetProfileDirectly]="true"
         [showIcon]="true"
         [user]="user"
         (itemDeleted)="onWatchlistItemDeleted($event)"

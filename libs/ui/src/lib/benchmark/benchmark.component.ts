@@ -10,6 +10,7 @@ import {
   User
 } from '@ghostfolio/common/interfaces';
 import { hasPermission, permissions } from '@ghostfolio/common/permissions';
+import { internalRoutes } from '@ghostfolio/common/routes/routes';
 import { NotificationService } from '@ghostfolio/ui/notifications';
 
 import {
@@ -68,6 +69,7 @@ export class GfBenchmarkComponent {
   public readonly deviceType = input.required<string>();
   public readonly hasPermissionToDeleteItem = input<boolean>();
   public readonly locale = input(getLocale());
+  public readonly openAssetProfileDirectly = input(false);
   public readonly showIcon = input(false);
   public readonly showSymbol = input(true);
   public readonly user = input<User>();
@@ -153,6 +155,20 @@ export class GfBenchmarkComponent {
     dataSource,
     symbol
   }: AssetProfileIdentifier) {
+    if (
+      this.openAssetProfileDirectly() &&
+      hasPermission(this.user()?.permissions, permissions.accessAdminControl)
+    ) {
+      this.router.navigate(
+        internalRoutes.adminControl.subRoutes.marketData.subRoutes.update.routerLink(
+          dataSource,
+          symbol
+        )
+      );
+
+      return;
+    }
+
     this.router.navigate([], {
       queryParams: { dataSource, symbol, benchmarkDetailDialog: true }
     });
