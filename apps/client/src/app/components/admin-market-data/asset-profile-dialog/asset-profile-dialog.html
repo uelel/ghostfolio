@@ -513,45 +513,31 @@
               </mat-form-field>
             </div>
             <div class="col-12 mb-3">
-              <mat-form-field appearance="outline" class="w-100">
-                <mat-label i18n>Tailwinds (one per line)</mat-label>
-                <textarea
-                  cdkAutosizeMinRows="4"
-                  cdkTextareaAutosize
-                  formControlName="tailwinds"
-                  matInput
-                  [maxlength]="BULLET_LIST_MAXIMUM_LENGTH"
-                  (keyup.enter)="$event.stopPropagation()"
-                ></textarea>
-              </mat-form-field>
+              <div class="h6" i18n>Tailwinds</div>
+              <gf-bullet-list-input
+                formControlName="tailwinds"
+                i18n-placeholder
+                placeholder="Add a tailwind"
+                [maxLength]="BULLET_LIST_MAXIMUM_LENGTH"
+              />
             </div>
             <div class="col-12 mb-3">
-              <mat-form-field appearance="outline" class="w-100">
-                <mat-label i18n
-                  >Competitive Advantages (one per line)</mat-label
-                >
-                <textarea
-                  cdkAutosizeMinRows="4"
-                  cdkTextareaAutosize
-                  formControlName="competitiveAdvantages"
-                  matInput
-                  [maxlength]="BULLET_LIST_MAXIMUM_LENGTH"
-                  (keyup.enter)="$event.stopPropagation()"
-                ></textarea>
-              </mat-form-field>
+              <div class="h6" i18n>Competitive Advantages</div>
+              <gf-bullet-list-input
+                formControlName="competitiveAdvantages"
+                i18n-placeholder
+                placeholder="Add a competitive advantage"
+                [maxLength]="BULLET_LIST_MAXIMUM_LENGTH"
+              />
             </div>
             <div class="col-12 mb-3">
-              <mat-form-field appearance="outline" class="w-100">
-                <mat-label i18n>Risks (one per line)</mat-label>
-                <textarea
-                  cdkAutosizeMinRows="4"
-                  cdkTextareaAutosize
-                  formControlName="risks"
-                  matInput
-                  [maxlength]="BULLET_LIST_MAXIMUM_LENGTH"
-                  (keyup.enter)="$event.stopPropagation()"
-                ></textarea>
-              </mat-form-field>
+              <div class="h6" i18n>Risks</div>
+              <gf-bullet-list-input
+                formControlName="risks"
+                i18n-placeholder
+                placeholder="Add a risk"
+                [maxLength]="BULLET_LIST_MAXIMUM_LENGTH"
+              />
             </div>
           </div>
         </div>

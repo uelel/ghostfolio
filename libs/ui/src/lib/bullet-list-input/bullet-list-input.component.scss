@@ -1,0 +1,90 @@
+:host {
+  display: block;
+
+  .bullet-list {
+    border: 1px solid rgba(var(--dark-dividers));
+    border-radius: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    list-style: none;
+    margin: 0;
+    min-height: 2.5rem;
+    padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+  }
+
+  .bullet-list-item {
+    gap: 0.5rem;
+
+    &:hover,
+    &:focus-within {
+      .delete-button {
+        visibility: visible;
+      }
+    }
+  }
+
+  .bullet {
+    line-height: 1.5rem;
+  }
+
+  .add-row {
+    &.has-items {
+      border-top: 1px dashed rgba(var(--dark-dividers));
+      margin-top: 0.25rem;
+      padding-top: 0.25rem;
+    }
+
+    label {
+      border-radius: 0.25rem;
+      cursor: text;
+      gap: 0.5rem;
+      margin-left: -0.25rem !important;
+      padding: 0.25rem;
+
+      &:hover,
+      &:focus-within {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+    }
+
+    .add-icon {
+      flex-shrink: 0;
+      font-size: 1rem;
+      margin-top: 0.25rem;
+      opacity: 0.6;
+    }
+  }
+
+  textarea {
+    background: transparent;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    line-height: 1.5rem;
+    outline: none;
+    overflow: hidden;
+    padding: 0;
+    resize: none;
+  }
+
+  .delete-button {
+    height: 1.5rem;
+    line-height: 1.5rem;
+    visibility: hidden;
+  }
+}
+
+:host-context(.theme-dark) {
+  .bullet-list,
+  .add-row.has-items {
+    border-color: rgba(var(--light-dividers));
+  }
+
+  .add-row label {
+    &:hover,
+    &:focus-within {
+      background-color: rgba(255, 255, 255, 0.06);
+    }
+  }
+}
