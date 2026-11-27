@@ -24,12 +24,4 @@ This app allows maintenance of a dividend portfolio:
 ## TODO
 
 - Research tab: autosave when clicking outside text fields
-- Financials tab: reverse unit order in the dropdown — M first, B second
-- Financials tab: add new units: 10M, 1T
-- Financials tab: revenue rows - move the delete icon
-- Financials tab: center monetary amounts with units horizontally
-- Financials tab: revenue rows - break long labels to a new line, display whole text
 - Valuation tab: show valuations from oldest (top) to latest (bottom)
-- Fundamentals tab: when a table is expanded by clicking, the popup scrolls down and you have to scroll back up to edit values. The scroll is caused by the previously expanded table collapsing when another one is expanded. Remove the scroll-down on table expand
-- Fundamentals tab: display the upload date (DD.MM.YYYY) of the shares outstanding image
-- Fundamentals tab: calculate CAGR for the given tabular data
