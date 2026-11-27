@@ -40,7 +40,8 @@
   }
 
   .section-header,
-  .add-row-cell {
+  .add-row-cell,
+  .add-row-spacer {
     border-right: none;
   }
 
@@ -77,8 +78,13 @@
     }
   }
 
-  .money-input {
+  .dynamic-row-name {
+    line-height: 1.4;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    resize: none;
     text-align: left;
+    white-space: pre-wrap;
   }
 
   .percent-input-wrapper {
@@ -142,6 +148,22 @@
   .add-column-header {
     min-width: 3rem;
     text-align: center;
+  }
+
+  .add-column-cell {
+    min-width: 3rem;
+    text-align: right;
+
+    .remove-row-button {
+      color: rgba(var(--palette-foreground-secondary-text));
+      font-size: 1rem;
+      opacity: 0.6;
+      transition: opacity 150ms ease;
+
+      &:hover:not(:disabled) {
+        opacity: 1;
+      }
+    }
   }
 
   .scale-select {

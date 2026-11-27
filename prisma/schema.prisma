@@ -452,8 +452,10 @@ enum FinancialsCurrency {
 }
 
 enum FinancialsScale {
-  B
   M
+  M10
+  B
+  T
 }
 
 enum MarketDataState {
