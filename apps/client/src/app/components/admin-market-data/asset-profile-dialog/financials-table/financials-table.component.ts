@@ -38,9 +38,16 @@ import { MatTableModule } from '@angular/material/table';
 import { IonIcon } from '@ionic/angular/standalone';
 import { format, isValid, parse, subDays } from 'date-fns';
 import { addIcons } from 'ionicons';
-import { addOutline, calendarOutline, trashOutline } from 'ionicons/icons';
+import {
+  addOutline,
+  calendarOutline,
+  closeOutline,
+  trashOutline
+} from 'ionicons/icons';
 import { Subscription } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
+
+import { GfAutosizeTextareaDirective } from './autosize-textarea.directive';
 
 type RowGroup = FormGroup<{
   name: FormControl<string | null>;
@@ -125,6 +132,7 @@ type RowDescriptor =
     MatFormFieldModule,
     MatInputModule,
     MatTableModule,
+    GfAutosizeTextareaDirective,
     ReactiveFormsModule
   ],
   selector: 'gf-financials-table',
@@ -144,7 +152,15 @@ export class GfFinancialsTableComponent implements OnChanges, OnDestroy {
   protected readonly currencyOptions = Object.values(FinancialsCurrency);
   protected displayedColumns: string[] = ['label', 'add'];
   protected rows: RowDescriptor[] = [];
-  protected readonly scaleOptions = Object.values(FinancialsScale);
+  // Ordered from lowest to highest; Prisma enum names cannot start with a
+  // digit, hence the separate display labels
+  protected readonly scaleOptions: { label: string; value: FinancialsScale }[] =
+    [
+      { label: 'M', value: FinancialsScale.M },
+      { label: '10M', value: FinancialsScale.M10 },
+      { label: 'B', value: FinancialsScale.B },
+      { label: 'T', value: FinancialsScale.T }
+    ];
 
   private readonly adminService = inject(AdminService);
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
@@ -190,7 +206,7 @@ export class GfFinancialsTableComponent implements OnChanges, OnDestroy {
   private readonly patchSubscriptions = new Set<Subscription>();
 
   public constructor() {
-    addIcons({ addOutline, calendarOutline, trashOutline });
+    addIcons({ addOutline, calendarOutline, closeOutline, trashOutline });
   }
 
   public ngOnChanges(changes: SimpleChanges): void {

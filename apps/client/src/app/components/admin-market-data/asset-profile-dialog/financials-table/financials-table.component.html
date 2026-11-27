@@ -44,35 +44,24 @@
             <ng-container i18n>Currency</ng-container>
           }
           @case ('dynamic') {
-            <div class="d-flex align-items-center">
-              <input
-                class="form-control form-control-sm flex-grow-1"
-                i18n-placeholder
-                placeholder="Name"
-                type="text"
-                [disabled]="!canEdit"
-                [value]="
-                  dynamicRowNameControl(row.section, row.rowIndex)?.value ?? ''
-                "
-                (input)="
-                  onDynamicRowNameChange(
-                    row.section,
-                    row.rowIndex,
-                    $any($event.target).value
-                  )
-                "
-              />
-              <button
-                aria-label="Remove row"
-                i18n-aria-label
-                mat-icon-button
-                type="button"
-                [disabled]="!canEdit"
-                (click)="onRemoveDynamicRow(row.section, row.rowIndex)"
-              >
-                <ion-icon name="trash-outline" />
-              </button>
-            </div>
+            <textarea
+              class="form-control form-control-sm dynamic-row-name"
+              gfAutosizeTextarea
+              i18n-placeholder
+              placeholder="Name"
+              rows="1"
+              [disabled]="!canEdit"
+              [value]="
+                dynamicRowNameControl(row.section, row.rowIndex)?.value ?? ''
+              "
+              (input)="
+                onDynamicRowNameChange(
+                  row.section,
+                  row.rowIndex,
+                  $any($event.target).value
+                )
+              "
+            ></textarea>
           }
           @case ('money') {
             {{ row.label }}
@@ -152,8 +141,10 @@
                   [formControl]="$any(column.form.controls[row.scaleControl])"
                 >
                   <option [ngValue]="null"></option>
-                  @for (option of scaleOptions; track option) {
-                    <option [ngValue]="option">{{ option }}</option>
+                  @for (option of scaleOptions; track option.value) {
+                    <option [ngValue]="option.value">
+                      {{ option.label }}
+                    </option>
                   }
                 </select>
               </div>
@@ -204,10 +195,24 @@
       </ng-container>
     }
 
-    <!-- Add-column (layout spacer; button moved to fiscalYearTitle header) -->
+    <!-- Add-column (button lives in fiscalYearTitle header; holds row delete for dynamic rows) -->
     <ng-container matColumnDef="add">
       <th *matHeaderCellDef class="add-column-header" mat-header-cell></th>
-      <td *matCellDef="let _" mat-cell></td>
+      <td *matCellDef="let row" class="add-column-cell" mat-cell>
+        @if (row.kind === 'dynamic') {
+          <button
+            aria-label="Remove row"
+            class="remove-row-button"
+            i18n-aria-label
+            mat-icon-button
+            type="button"
+            [disabled]="!canEdit"
+            (click)="onRemoveDynamicRow(row.section, row.rowIndex)"
+          >
+            <ion-icon name="close-outline" />
+          </button>
+        }
+      </td>
     </ng-container>
 
     <!-- Section header row (spans full width via one colspan cell) -->
@@ -222,13 +227,18 @@
       </td>
     </ng-container>
 
-    <!-- Add-row row (one spanning cell with [+ row] button) -->
+    <!-- Add-row row: empty label cell, [+ row] button spanning the snapshot
+         columns, empty add-column cell -->
+    <ng-container matColumnDef="addRowLabel" sticky>
+      <td *matCellDef="let _" class="metric-label add-row-spacer" mat-cell></td>
+    </ng-container>
+
     <ng-container matColumnDef="addRowCell">
       <td
         *matCellDef="let row"
         class="add-row-cell"
         mat-cell
-        [attr.colspan]="displayedColumns.length"
+        [attr.colspan]="displayedColumns.length - 1"
       >
         <button
           mat-stroked-button
@@ -258,7 +268,11 @@
       mat-row
     ></tr>
     <tr
-      *matRowDef="let row; columns: ['addRowCell']; when: isAddRow"
+      *matRowDef="
+        let row;
+        columns: ['addRowLabel', 'addRowCell'];
+        when: isAddRow
+      "
       class="add-row-row"
       mat-row
     ></tr>
