@@ -33,6 +33,7 @@ export interface ExportResponse {
     | 'scraperConfiguration'
     | 'sharesOutstandingScreenshot'
     | 'sharesOutstandingScreenshotContentType'
+    | 'sharesOutstandingScreenshotUploadedAt'
     | 'symbolMapping'
     | 'updatedAt'
     | 'userId'

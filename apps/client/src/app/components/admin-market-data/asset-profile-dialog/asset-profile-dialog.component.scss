@@ -39,6 +39,14 @@
     padding-right: 0.5rem !important;
   }
 
+  .upload-date {
+    background: rgba(128, 128, 128, 0.15);
+    border-radius: 2px;
+    font-family: var(--bs-font-monospace, monospace);
+    font-size: 0.9em;
+    padding: 0 0.25rem;
+  }
+
   .screenshot-drop-zone {
     border: 1px dashed var(--mat-sys-outline, rgba(0, 0, 0, 0.2));
     border-radius: 4px;

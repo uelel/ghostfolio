@@ -224,6 +224,7 @@ export class SymbolProfileService {
       sectors,
       sharesOutstandingScreenshot,
       sharesOutstandingScreenshotContentType,
+      sharesOutstandingScreenshotUploadedAt,
       symbolMapping,
       tailwinds,
       url
@@ -251,6 +252,7 @@ export class SymbolProfileService {
         sectors,
         sharesOutstandingScreenshot,
         sharesOutstandingScreenshotContentType,
+        sharesOutstandingScreenshotUploadedAt,
         symbolMapping,
         tailwinds,
         url

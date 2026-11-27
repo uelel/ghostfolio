@@ -223,6 +223,7 @@ export class GfAssetProfileDialogComponent implements OnInit {
     sharesOutstandingScreenshotContentType: new FormControl<string | null>(
       null
     ),
+    sharesOutstandingScreenshotUploadedAt: new FormControl<string | null>(null),
     symbolMapping: ['', jsonValidator()],
     tailwinds: '',
     url: ''
@@ -578,6 +579,12 @@ export class GfAssetProfileDialogComponent implements OnInit {
               this.assetProfile?.sharesOutstandingScreenshot ?? null,
             sharesOutstandingScreenshotContentType:
               this.assetProfile?.sharesOutstandingScreenshotContentType ?? null,
+            sharesOutstandingScreenshotUploadedAt: this.assetProfile
+              ?.sharesOutstandingScreenshotUploadedAt
+              ? new Date(
+                  this.assetProfile.sharesOutstandingScreenshotUploadedAt
+                ).toISOString()
+              : null,
             symbolMapping: JSON.stringify(
               this.assetProfile?.symbolMapping ?? {}
             ),
@@ -734,6 +741,21 @@ export class GfAssetProfileDialogComponent implements OnInit {
     event.preventDefault();
 
     this.readValuationScreenshotFile(file);
+  }
+
+  protected get sharesOutstandingScreenshotUploadDate(): string | null {
+    const uploadedAt =
+      this.assetProfileForm.controls.sharesOutstandingScreenshotUploadedAt
+        .value;
+
+    if (
+      !uploadedAt ||
+      !this.assetProfileForm.controls.sharesOutstandingScreenshot.value
+    ) {
+      return null;
+    }
+
+    return format(new Date(uploadedAt), 'dd.MM.yyyy');
   }
 
   protected onSharesOutstandingScreenshotSelected(event: Event) {
@@ -966,6 +988,9 @@ export class GfAssetProfileDialogComponent implements OnInit {
         this.assetProfileForm.controls.sharesOutstandingScreenshot.value,
       sharesOutstandingScreenshotContentType:
         this.assetProfileForm.controls.sharesOutstandingScreenshotContentType
+          .value,
+      sharesOutstandingScreenshotUploadedAt:
+        this.assetProfileForm.controls.sharesOutstandingScreenshotUploadedAt
           .value,
       tailwinds: getStringOrNull(
         this.assetProfileForm.controls.tailwinds.value
@@ -1296,7 +1321,10 @@ export class GfAssetProfileDialogComponent implements OnInit {
   ) {
     this.assetProfileForm.patchValue({
       sharesOutstandingScreenshot: aScreenshot?.data ?? null,
-      sharesOutstandingScreenshotContentType: aScreenshot?.contentType ?? null
+      sharesOutstandingScreenshotContentType: aScreenshot?.contentType ?? null,
+      sharesOutstandingScreenshotUploadedAt: aScreenshot
+        ? new Date().toISOString()
+        : null
     });
 
     this.assetProfileForm.controls.sharesOutstandingScreenshot.markAsDirty();

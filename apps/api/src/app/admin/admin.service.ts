@@ -492,6 +492,7 @@ export class AdminService {
       sectors,
       sharesOutstandingScreenshot,
       sharesOutstandingScreenshotContentType,
+      sharesOutstandingScreenshotUploadedAt,
       symbol: newSymbol,
       symbolMapping,
       tailwinds,
@@ -634,6 +635,12 @@ export class AdminService {
         }),
         ...(sharesOutstandingScreenshotContentType !== undefined && {
           sharesOutstandingScreenshotContentType
+        }),
+        ...(sharesOutstandingScreenshotUploadedAt !== undefined && {
+          sharesOutstandingScreenshotUploadedAt:
+            sharesOutstandingScreenshotUploadedAt === null
+              ? null
+              : new Date(sharesOutstandingScreenshotUploadedAt)
         }),
         ...this.symbolProfileService.getAssetProfileUpdateInput(
           { dataSource, symbol },
