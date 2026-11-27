@@ -949,6 +949,7 @@ export class ImportService {
             risks: assetProfile.risks,
             sharesOutstandingScreenshot: null,
             sharesOutstandingScreenshotContentType: null,
+            sharesOutstandingScreenshotUploadedAt: null,
             tailwinds: assetProfile.tailwinds,
             userId: dataSource === 'MANUAL' ? user.id : undefined
           },

@@ -43,6 +43,7 @@ export interface EnhancedAssetProfile {
   sectors: Sector[];
   sharesOutstandingScreenshot?: string | null;
   sharesOutstandingScreenshotContentType?: string | null;
+  sharesOutstandingScreenshotUploadedAt?: Date | string | null;
   symbol: string;
   symbolMapping?: { [key: string]: string };
   tailwinds?: string;

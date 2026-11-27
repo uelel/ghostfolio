@@ -20,6 +20,7 @@ import {
   IsBoolean,
   IsEnum,
   IsIn,
+  IsISO8601,
   IsObject,
   IsOptional,
   IsString,
@@ -137,6 +138,10 @@ export class UpdateAssetProfileDto {
   @IsIn(['image/png', 'image/jpeg', 'image/webp'])
   @IsOptional()
   sharesOutstandingScreenshotContentType?: string | null;
+
+  @IsISO8601()
+  @IsOptional()
+  sharesOutstandingScreenshotUploadedAt?: string | null;
 
   @IsOptional()
   @IsString()

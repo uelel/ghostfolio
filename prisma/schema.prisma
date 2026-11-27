@@ -311,6 +311,7 @@ model SymbolProfile {
   sectors                                Json?
   sharesOutstandingScreenshot            Bytes?
   sharesOutstandingScreenshotContentType String?
+  sharesOutstandingScreenshotUploadedAt  DateTime?
   symbol                                 String
   symbolMapping                          Json?
   tailwinds                              String?

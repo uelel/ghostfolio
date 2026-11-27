@@ -549,6 +549,7 @@
         </ng-template>
         <div class="container px-0 py-3" [formGroup]="assetProfileForm">
           <gf-historical-metric-editor
+            cagrMetricName="EPS"
             class="d-block mb-4"
             formControlName="historicalEps"
             i18n-label
@@ -561,6 +562,7 @@
             [locale]="data.locale"
           />
           <gf-historical-metric-editor
+            cagrMetricName="DPS"
             class="d-block mb-4"
             formControlName="historicalDps"
             i18n-label
@@ -582,7 +584,12 @@
             [locale]="data.locale"
           />
           <div (paste)="onSharesOutstandingScreenshotPasted($event)">
-            <div class="h5" i18n>Shares Outstanding</div>
+            <div class="h5">
+              <ng-container i18n>Shares Outstanding</ng-container>
+              @if (sharesOutstandingScreenshotUploadDate; as uploadDate) {
+                <span class="ml-1 upload-date">{{ uploadDate }}</span>
+              }
+            </div>
             <label class="d-block mb-1" i18n
               >Screenshot of Shares Outstanding</label
             >

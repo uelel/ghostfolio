@@ -41,6 +41,7 @@ import {
   LineController,
   LineElement,
   PointElement,
+  SubTitle,
   Title,
   Tooltip
 } from 'chart.js';
@@ -76,6 +77,8 @@ type MetricRowGroup = FormGroup<{
 export class GfHistoricalMetricEditorComponent
   implements AfterViewInit, ControlValueAccessor, OnDestroy, OnInit
 {
+  /** When set, the CAGR of the series is shown in the chart (e.g. "EPS") */
+  @Input() cagrMetricName?: string;
   @Input() colorScheme: ColorScheme;
   @Input() currency: string;
   @Input() label: string;
@@ -109,6 +112,7 @@ export class GfHistoricalMetricEditorComponent
       LineController,
       LineElement,
       PointElement,
+      SubTitle,
       Title,
       Tooltip
     );
@@ -156,6 +160,8 @@ export class GfHistoricalMetricEditorComponent
 
     if (!target || !this.hostElementRef.nativeElement.contains(target)) {
       this.panel?.close();
+    } else {
+      this.keepInPlaceWhileOthersCollapse();
     }
   }
 
@@ -220,6 +226,104 @@ export class GfHistoricalMetricEditorComponent
     this.changeDetectorRef.markForCheck();
   }
 
+  /**
+   * Compound annual growth rate from the first to the last point, or null
+   * if it cannot be computed (fewer than two points, non-positive values or
+   * no time span)
+   */
+  private computeCagr(): {
+    cagr: number;
+    fromYear: number;
+    toYear: number;
+  } | null {
+    if (this.chartItems.length < 2) {
+      return null;
+    }
+
+    const first = this.chartItems[0];
+    const last = this.chartItems[this.chartItems.length - 1];
+    const [fromYear, fromMonth] = first.date.split('-').map(Number);
+    const [toYear, toMonth] = last.date.split('-').map(Number);
+    const years = toYear - fromYear + (toMonth - fromMonth) / 12;
+
+    if (first.value <= 0 || last.value <= 0 || years <= 0) {
+      return null;
+    }
+
+    return {
+      cagr: Math.pow(last.value / first.value, 1 / years) - 1,
+      fromYear,
+      toYear
+    };
+  }
+
+  private cagrText(): string {
+    if (!this.cagrMetricName) {
+      return '';
+    }
+
+    const result = this.computeCagr();
+
+    if (!result) {
+      return '';
+    }
+
+    const percent = Math.round(result.cagr * 100).toLocaleString(this.locale);
+
+    return $localize`${percent}% average increase in annual ${this.cagrMetricName} between ${result.fromYear} and ${result.toYear}`;
+  }
+
+  /**
+   * Clicking into this editor collapses the other (previously expanded)
+   * editors. If one of them sits above this one, the content shifts up and
+   * the dialog appears to scroll down. Compensate by keeping this editor at
+   * the same position on screen while the collapse animation runs.
+   */
+  private keepInPlaceWhileOthersCollapse(): void {
+    const host = this.hostElementRef.nativeElement;
+    const scrollParent = this.getScrollParent(host);
+
+    if (!scrollParent) {
+      return;
+    }
+
+    const initialTop = host.getBoundingClientRect().top;
+    const start = performance.now();
+
+    const step = () => {
+      const delta = host.getBoundingClientRect().top - initialTop;
+
+      if (Math.abs(delta) >= 0.5) {
+        scrollParent.scrollTop += delta;
+      }
+
+      if (performance.now() - start < 500) {
+        requestAnimationFrame(step);
+      }
+    };
+
+    requestAnimationFrame(step);
+  }
+
+  private getScrollParent(element: HTMLElement): HTMLElement | null {
+    let parent = element.parentElement;
+
+    while (parent) {
+      const { overflowY } = getComputedStyle(parent);
+
+      if (
+        (overflowY === 'auto' || overflowY === 'scroll') &&
+        parent.scrollHeight > parent.clientHeight
+      ) {
+        return parent;
+      }
+
+      parent = parent.parentElement;
+    }
+
+    return null;
+  }
+
   private formatValue(value: number): string {
     if (this.unit === 'percent') {
       return `${value.toLocaleString(this.locale, {
@@ -275,6 +379,7 @@ export class GfHistoricalMetricEditorComponent
       return;
     }
 
+    const cagrText = this.cagrText();
     const labels = this.chartItems.map(({ date }) => this.toDisplayDate(date));
     const data = this.chartItems.map(({ value }) =>
       this.unit === 'percent' ? value * 100 : value
@@ -308,6 +413,14 @@ export class GfHistoricalMetricEditorComponent
             font: { size: 18, weight: 'normal' as const },
             padding: { bottom: 12, top: 4 },
             text: this.label
+          },
+          subtitle: {
+            align: 'center' as const,
+            color: 'rgba(128, 128, 128, 0.9)',
+            display: !!cagrText,
+            font: { size: 14, weight: 'normal' as const },
+            padding: { bottom: 12 },
+            text: cagrText
           },
           tooltip: {
             callbacks: {
