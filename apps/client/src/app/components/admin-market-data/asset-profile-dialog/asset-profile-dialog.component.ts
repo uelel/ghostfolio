@@ -50,6 +50,7 @@ import {
   DataSource,
   ValuationCategory
 } from '@ghostfolio/prisma/enums';
+import { GfBulletListInputComponent } from '@ghostfolio/ui/bullet-list-input';
 import { GfCurrencySelectorComponent } from '@ghostfolio/ui/currency-selector';
 import { GfEntityLogoComponent } from '@ghostfolio/ui/entity-logo';
 import { GfHistoricalMarketDataEditorComponent } from '@ghostfolio/ui/historical-market-data-editor';
@@ -136,6 +137,7 @@ import { AssetProfileDialogParams } from './interfaces/interfaces';
   imports: [
     CommonModule,
     FormsModule,
+    GfBulletListInputComponent,
     GfCurrencySelectorComponent,
     GfEntityLogoComponent,
     GfFinancialsTableComponent,

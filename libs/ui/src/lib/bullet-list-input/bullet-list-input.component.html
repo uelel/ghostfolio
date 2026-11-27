@@ -1,0 +1,57 @@
+<ul class="bullet-list" [class.disabled]="isDisabled()">
+  @for (item of items(); track $index; let index = $index) {
+    <li class="align-items-start bullet-list-item d-flex">
+      <span aria-hidden="true" class="bullet">•</span>
+      <textarea
+        #itemTextarea
+        cdkAutosizeMinRows="1"
+        cdkTextareaAutosize
+        class="flex-grow-1"
+        rows="1"
+        [attr.maxlength]="getItemMaxLength(index)"
+        [disabled]="isDisabled()"
+        [value]="item"
+        (blur)="onItemBlur(index)"
+        (input)="onItemInput(index, $event)"
+        (keydown)="onItemKeydown(index, $event)"
+        (keyup.enter)="$event.stopPropagation()"
+        (paste)="onItemPaste(index, $event)"
+      ></textarea>
+      @if (!isDisabled()) {
+        <button
+          class="delete-button no-min-width px-1"
+          mat-button
+          tabindex="-1"
+          type="button"
+          [attr.aria-label]="'Delete item'"
+          (click)="onDeleteItem(index)"
+        >
+          <ion-icon name="close-outline" />
+        </button>
+      }
+    </li>
+  }
+  @if (!isDisabled()) {
+    <li class="add-row" [class.has-items]="items().length > 0">
+      <label class="align-items-start d-flex m-0">
+        <ion-icon aria-hidden="true" class="add-icon" name="add-outline" />
+        <textarea
+          #addTextarea
+          cdkAutosizeMinRows="1"
+          cdkTextareaAutosize
+          class="flex-grow-1"
+          rows="1"
+          [attr.aria-label]="placeholder()"
+          [attr.maxlength]="getAddMaxLength()"
+          [placeholder]="placeholder()"
+          [value]="draft()"
+          (blur)="onAddBlur()"
+          (input)="onAddInput($event)"
+          (keydown)="onAddKeydown($event)"
+          (keyup.enter)="$event.stopPropagation()"
+          (paste)="onAddPaste($event)"
+        ></textarea>
+      </label>
+    </li>
+  }
+</ul>
